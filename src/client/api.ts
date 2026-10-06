@@ -1,3 +1,5 @@
+export const AUTH_EXPIRED = 'auth:expired'
+
 export type ApiResult<T> = { ok: boolean; status: number; data: T | null }
 
 export async function api<T = unknown>(
@@ -13,6 +15,9 @@ export async function api<T = unknown>(
       headers: { 'Content-Type': 'application/json' },
       body: body === undefined ? undefined : JSON.stringify(body),
     })
+    if (res.status === 401 && path !== '/api/me' && !path.startsWith('/api/auth/')) {
+      window.dispatchEvent(new Event(AUTH_EXPIRED))
+    }
     const text = await res.text()
     let data: T | null = null
     try {
