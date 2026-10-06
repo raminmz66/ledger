@@ -10,7 +10,7 @@ export default function Settings() {
   const [failed, setFailed] = useState(false)
   const { canPrompt, promptInstall, showIosHint } = useInstall()
   return (
-    <main className="page">
+    <main className="page settings-page">
       <Link to="/" className="icon-link">{copy.settings.back}</Link>
       <h1 className="auth-title">{copy.settings.title}</h1>
       <div className="settings-row">
@@ -40,7 +40,7 @@ export default function Settings() {
         {copy.settings.logout}
       </button>
       {failed && <p className="form-error" role="alert">{copy.settings.errLogout}</p>}
-      <p className="tagline">{copy.settings.version}</p>
+      <p className="tagline settings-version">{copy.settings.version}</p>
     </main>
   )
 }

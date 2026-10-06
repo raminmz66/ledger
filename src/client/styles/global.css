@@ -520,3 +520,15 @@ html {
   margin-block: 0 0.5rem;
   font-size: 1rem;
 }
+
+/* Settings: keep the app name + version pinned to the bottom of the screen. */
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-block-size: 100%;
+}
+.settings-version {
+  margin-block: auto 0;
+  padding-block: 2rem 1rem;
+}
