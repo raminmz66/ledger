@@ -1,7 +1,7 @@
 export type ApiResult<T> = { ok: boolean; status: number; data: T | null }
 
 export async function api<T = unknown>(
-  method: 'GET' | 'POST',
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
   path: string,
   body?: unknown,
 ): Promise<ApiResult<T>> {
@@ -14,7 +14,13 @@ export async function api<T = unknown>(
       body: body === undefined ? undefined : JSON.stringify(body),
     })
     const text = await res.text()
-    return { ok: res.ok, status: res.status, data: text ? (JSON.parse(text) as T) : null }
+    let data: T | null = null
+    try {
+      data = text ? (JSON.parse(text) as T) : null
+    } catch {
+      // Non-JSON body (CSRF text, proxy HTML): keep the real status.
+    }
+    return { ok: res.ok, status: res.status, data }
   } catch {
     return { ok: false, status: 0, data: null }
   }

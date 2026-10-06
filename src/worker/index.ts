@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { csrf } from 'hono/csrf'
+import { HTTPException } from 'hono/http-exception'
 import type { AppEnv } from './env'
 import { cleanupExpired } from './lib/cleanup'
 import { requireAuth } from './middleware/require-auth'
@@ -17,6 +18,9 @@ app.get('/api/me', requireAuth, async (c) => {
     .bind(c.var.userId).first<{ email: string }>()
   return row ? c.json({ email: row.email }) : c.json({ error: 'unauthorized' }, 401)
 })
+
+// HTTPException (e.g. the CSRF 403) keeps its own response.
+app.onError((e, c) => (e instanceof HTTPException ? e.getResponse() : c.json({ error: 'internal' }, 500)))
 
 app.notFound((c) => c.json({ error: 'not_found' }, 404))
 

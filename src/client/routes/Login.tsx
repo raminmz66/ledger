@@ -7,7 +7,7 @@ import copy from '../copy'
 import { toFaDigits } from '../format/digits'
 
 const t = copy.signIn
-type Err = { error?: string; retryAfter?: number; attemptsLeft?: number }
+type Err = { email?: string; error?: string; retryAfter?: number; attemptsLeft?: number }
 
 export default function Login() {
   const { status, setAuthed } = useAuth()
@@ -44,7 +44,7 @@ export default function Login() {
     else if (r.status === 429) {
       const wait = r.data?.retryAfter ?? 60
       setError(wait <= 60 ? t.errWaitSeconds : t.errRateLimited)
-      if (step === 'code') { setSeconds(wait); setCanResend(false) }
+      if (step === 'code') { setSeconds(Math.min(wait, 60)); setCanResend(false) }
     } else if (r.data?.error === 'invalid_email') setError(t.errInvalidEmail)
     else if (r.data?.error === 'email_failed') setError(t.errEmailFailed)
     else setError(t.errGeneric)
@@ -56,7 +56,7 @@ export default function Login() {
     const r = await api<Err>('POST', '/api/auth/verify', { email: email.trim(), code: value })
     setBusy(false)
     if (r.ok) {
-      setAuthed(email.trim())
+      setAuthed(r.data?.email ?? email.trim())
       navigate('/', { replace: true })
       return
     }
@@ -68,7 +68,9 @@ export default function Login() {
     else if (d?.error === 'invalid_code') setError(t.errInvalidCode)
     else if (d?.error === 'wrong_code') {
       const left = d.attemptsLeft ?? 0
-      setError(`${t.errWrongCode} ${t.errAttemptsLeft} ${toFaDigits(left)}`)
+      setError(left === 0
+        ? `${t.errWrongCode} ${t.errCodeExpired}`
+        : `${t.errWrongCode} ${t.errAttemptsLeft} ${toFaDigits(left)}`)
       if (left === 0) setCanResend(true)
     } else setError(t.errGeneric)
   }

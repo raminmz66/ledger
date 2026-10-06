@@ -20,6 +20,10 @@ describe('api', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('x')))
     expect(await api('GET', '/api/me')).toEqual({ ok: false, status: 0, data: null })
   })
+  it('keeps the real status when the body is not JSON', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('Forbidden', { status: 403 })))
+    expect(await api('POST', '/api/x', {})).toEqual({ ok: false, status: 403, data: null })
+  })
   it('sends JSON with same-origin credentials', async () => {
     const f = vi.fn().mockResolvedValue(new Response(null, { status: 204 }))
     vi.stubGlobal('fetch', f)

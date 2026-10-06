@@ -31,8 +31,10 @@ export default function OtpInput({ length = 6, disabled, onComplete, onChange: o
 
   const onChange = (i: number, raw: string) => {
     // Autofill can deliver the whole code into one box: treat it like a paste.
-    if (raw.length > 1) return fill(raw)
-    const d = toLatinDigits(raw)
+    // (No maxLength on the boxes: browsers would truncate that to one digit.)
+    if (toLatinDigits(raw).replace(/\D/g, '').length >= length) return fill(raw)
+    // Typing into a filled box replaces its digit with the new one.
+    const d = toLatinDigits(raw.length > 1 ? (raw[0] === digits[i] ? raw.slice(-1) : raw[0]!) : raw)
     if (d === '') return commit(digits.map((x, j) => (j === i ? '' : x)), i)
     if (!/^\d$/.test(d)) return
     const next = [...digits]
@@ -62,7 +64,6 @@ export default function OtpInput({ length = 6, disabled, onComplete, onChange: o
           disabled={disabled}
           inputMode="numeric"
           autoComplete={i === 0 ? 'one-time-code' : 'off'}
-          maxLength={1}
           aria-label={`${copy.signIn.digitLabel} ${toFaDigits(i + 1)}`}
           onChange={(e) => onChange(i, e.target.value)}
           onPaste={onPaste}

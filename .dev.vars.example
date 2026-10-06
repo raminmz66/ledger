@@ -1,3 +1,5 @@
 SESSION_SECRET=change-me-to-a-long-random-string
 RESEND_API_KEY=re_your_key_here
+# local dev only: logs the code instead of emailing; never set in production
+EMAIL_DEV_LOG=1
 EMAIL_FROM=سیمرغ <onboarding@resend.dev>

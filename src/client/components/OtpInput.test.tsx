@@ -49,6 +49,23 @@ describe('OtpInput', () => {
     expect(boxes().map((b) => b.value).join('')).toBe('')
   })
 
+  it('fills all boxes from a 6-digit value of any length-checked input event', async () => {
+    const onComplete = vi.fn()
+    render(<OtpInput onComplete={onComplete} />)
+    expect(boxes()[0]!.hasAttribute('maxlength')).toBe(false)
+    fireEvent.change(boxes()[0]!, { target: { value: '۴۸۱۲۰۹' } })
+    expect(onComplete).toHaveBeenCalledWith('481209')
+  })
+
+  it('typing a different digit into a filled box replaces it', async () => {
+    render(<OtpInput onComplete={() => {}} />)
+    await userEvent.click(boxes()[0]!)
+    await userEvent.keyboard('1')
+    await userEvent.click(boxes()[0]!)
+    await userEvent.keyboard('7')
+    expect(boxes()[0]!.value).toBe('7')
+  })
+
   it('treats a multi-character value in one box (autofill) like a paste', async () => {
     const onComplete = vi.fn()
     render(<OtpInput onComplete={onComplete} />)

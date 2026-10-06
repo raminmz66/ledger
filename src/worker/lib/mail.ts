@@ -5,7 +5,7 @@ type MailEnv = Pick<Env, 'RESEND_API_KEY' | 'EMAIL_FROM' | 'EMAIL_DEV_LOG'>
 export function loginEmail(code: string): { subject: string; html: string; text: string } {
   const subject = `کد ورود به سیمرغ: ${code}`
   const intro = 'کد ورود شما به دفتر حساب سیمرغ'
-  const note = 'این کد ۱۰ دقیقه اعتبار دارد. اگر شما درخواست ورود نکرده‌اید، این ایمیل را نادیده بگیرید.'
+  const note = 'این کد ۱۰ دقیقه اعتبار دارد. اگر درخواست ورود نداده‌اید، این ایمیل را نادیده بگیرید.'
   const text = `${intro}:\n\n${code}\n\n${note}\n`
   const html = `<!doctype html>
 <html lang="fa" dir="rtl"><body dir="rtl" style="margin:0;padding:24px;background:#f4efe6;font-family:Tahoma,Arial,sans-serif;direction:rtl;text-align:right;color:#3d3428">
