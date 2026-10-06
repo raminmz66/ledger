@@ -139,6 +139,16 @@ describe('Person page', () => {
     await userEvent.click(screen.getByRole('button', { name: copy.personSheet.save }))
     expect(await screen.findByRole('heading', { name: 'علی احمدی' })).toBeInTheDocument()
     expect(calls.find((c) => c.method === 'PATCH')!.body).toEqual({ name: 'علی احمدی' })
+    expect(screen.getByRole('button', { name: copy.person.menu })).toHaveFocus()
+  })
+
+  it('returns focus to the paid button after the transaction sheet closes', async () => {
+    stubApi({ 'GET /api/people/p1': { status: 200, body: detail } })
+    renderPerson()
+    await screen.findByRole('heading', { name: 'علی رضایی' })
+    await userEvent.click(screen.getByRole('button', { name: copy.person.paidButton }))
+    await userEvent.keyboard('{Escape}')
+    expect(screen.getByRole('button', { name: copy.person.paidButton })).toHaveFocus()
   })
 
   it('deleting the person needs a second tap, names the real transaction count, then goes home', async () => {

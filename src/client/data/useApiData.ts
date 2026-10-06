@@ -14,7 +14,7 @@ export function useApiData<T>(path: string) {
     const res = await api<T>('GET', path)
     if (my !== seq.current) return
     if (res.ok) setState({ status: 'ready', data: res.data, error: null, httpStatus: res.status })
-    else setState((prev) => ({ status: 'error', data: prev.data, error: errorMessage(res as { status: number; data: { error?: string } | null }), httpStatus: res.status }))
+    else setState((prev) => ({ status: 'error', data: prev.data, error: errorMessage(res), httpStatus: res.status }))
   }, [path])
 
   useEffect(() => {

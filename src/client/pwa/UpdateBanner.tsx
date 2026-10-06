@@ -7,9 +7,10 @@ export function UpdateBanner() {
   const [apply, setApply] = useState<(() => void) | null>(null)
   const [applied, setApplied] = useState(false)
   useEffect(() => subscribeNeedRefresh((fn) => setApply(() => fn)), [])
-  if (!apply) return null
   return (
-    <div className="update-banner" role="status">
+    <div role="status">
+      {apply && (
+    <div className="update-banner">
       <span>{copy.update.ready}</span>
       <button
         className="btn btn--ghost update-banner__btn"
@@ -19,6 +20,8 @@ export function UpdateBanner() {
       >
         {copy.update.apply}
       </button>
+    </div>
+      )}
     </div>
   )
 }

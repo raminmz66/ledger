@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 
 type InstallEvent = Event & { prompt(): Promise<void> }
 
@@ -14,31 +14,32 @@ function isIos(): boolean {
     (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints ?? 0) > 1)
 }
 
+// Chrome fires beforeinstallprompt once, early: capture at module scope, not in a mounted component.
+let deferred: InstallEvent | null = null
+const listeners = new Set<() => void>()
+const notify = () => listeners.forEach((l) => l())
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e as InstallEvent; notify() })
+  window.addEventListener('appinstalled', () => { deferred = null; notify() })
+}
+const subscribe = (l: () => void) => { listeners.add(l); return () => { listeners.delete(l) } }
+
+export function __resetInstallForTests() { deferred = null; notify() }
+
 export function useInstall(): { canPrompt: boolean; promptInstall(): Promise<void>; showIosHint: boolean } {
-  const evtRef = useRef<InstallEvent | null>(null)
-  const [canPrompt, setCanPrompt] = useState(false)
-  useEffect(() => {
-    const onPrompt = (e: Event) => {
-      e.preventDefault()
-      evtRef.current = e as InstallEvent
-      setCanPrompt(true)
-    }
-    const onInstalled = () => { evtRef.current = null; setCanPrompt(false) }
-    window.addEventListener('beforeinstallprompt', onPrompt)
-    window.addEventListener('appinstalled', onInstalled)
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onPrompt)
-      window.removeEventListener('appinstalled', onInstalled)
-    }
-  }, [])
+  const evt = useSyncExternalStore(subscribe, () => deferred, () => null)
   const promptInstall = useCallback(async () => {
-    const e = evtRef.current
+    const e = deferred
     if (!e) return
-    await e.prompt()
-    // The event is single-use.
-    evtRef.current = null
-    setCanPrompt(false)
+    try {
+      await e.prompt()
+    } catch {
+      // A rejected prompt() just means no install; the event is single-use either way.
+    } finally {
+      deferred = null
+      notify()
+    }
   }, [])
   const standalone = isStandalone()
-  return { canPrompt: canPrompt && !standalone, promptInstall, showIosHint: !standalone && isIos() }
+  return { canPrompt: evt !== null && !standalone, promptInstall, showIosHint: !standalone && isIos() }
 }

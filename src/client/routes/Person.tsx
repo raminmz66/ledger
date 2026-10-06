@@ -27,6 +27,7 @@ export default function Person() {
   const [armed, setArmed] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const menuBtn = useRef<HTMLButtonElement>(null)
+  const paidBtn = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const toast = useToast()
@@ -109,7 +110,7 @@ export default function Person() {
       </section>
 
       <div className="person-actions">
-        <button type="button" className="btn" onClick={() => setTxSheet({ mode: 'add', direction: 'paid' })}>{copy.person.paidButton}</button>
+        <button type="button" ref={paidBtn} className="btn" onClick={() => setTxSheet({ mode: 'add', direction: 'paid' })}>{copy.person.paidButton}</button>
         <button type="button" className="btn btn--ghost" onClick={() => setTxSheet({ mode: 'add', direction: 'received' })}>{copy.person.receivedButton}</button>
       </div>
 
@@ -132,9 +133,9 @@ export default function Person() {
       )}
 
       {txSheet && (
-        <TransactionSheet {...txSheet} open personId={eid} personName={data.name} onClose={() => setTxSheet(null)} onSaved={() => void reload()} />
+        <TransactionSheet {...txSheet} open personId={eid} personName={data.name} returnFocusRef={paidBtn} onClose={() => setTxSheet(null)} onSaved={() => void reload()} />
       )}
-      <PersonSheet mode="rename" open={renaming} personId={eid} initialName={data.name} onClose={() => { setRenaming(false); menuBtn.current?.focus() }} onDone={() => { setRenaming(false); menuBtn.current?.focus(); void reload() }} />
+      <PersonSheet mode="rename" open={renaming} personId={eid} initialName={data.name} returnFocusRef={menuBtn} onClose={() => setRenaming(false)} onDone={() => { setRenaming(false); void reload() }} />
     </main>
   )
 }

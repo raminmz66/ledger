@@ -38,6 +38,19 @@ describe('Toast', () => {
     expect(screen.getByRole('alert')).toBeEmptyDOMElement()
   })
 
+  it('renders the live regions outside #root so an inert root cannot silence them', () => {
+    const root = document.createElement('div')
+    root.id = 'root'
+    root.setAttribute('inert', '')
+    document.body.appendChild(root)
+    render(<ToastProvider><Trigger tone="error" /></ToastProvider>, { container: root })
+    act(() => { screen.getByRole('button', { name: 'نشان بده' }).click() })
+    expect(root.contains(screen.getByRole('alert'))).toBe(false)
+    expect(root.contains(screen.getByRole('status'))).toBe(false)
+    expect(screen.getByRole('alert')).toHaveTextContent('پیام')
+    root.remove()
+  })
+
   it('a newer message replaces the older one and restarts the timer', () => {
     render(<ToastProvider><Trigger /></ToastProvider>)
     const btn = screen.getByRole('button', { name: 'نشان بده' })

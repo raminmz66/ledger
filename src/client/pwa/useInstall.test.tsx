@@ -1,12 +1,12 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { useInstall } from './useInstall'
+import { __resetInstallForTests, useInstall } from './useInstall'
 
 function mockEnv({ ua = 'Mozilla/5.0 (X11; Linux x86_64)', standalone = false, platform = 'Linux', touch = 0 } = {}) {
   vi.stubGlobal('navigator', { userAgent: ua, platform, maxTouchPoints: touch, standalone: undefined })
   vi.stubGlobal('matchMedia', (q: string) => ({ matches: standalone && q.includes('standalone'), addEventListener() {}, removeEventListener() {} }))
 }
-afterEach(() => vi.unstubAllGlobals())
+afterEach(() => { vi.unstubAllGlobals(); __resetInstallForTests() })
 
 describe('useInstall', () => {
   it('offers nothing by default on desktop/Android before the browser fires beforeinstallprompt', () => {
@@ -26,6 +26,23 @@ describe('useInstall', () => {
     await act(async () => { await result.current.promptInstall() })
     expect(prompt).toHaveBeenCalledTimes(1)
     act(() => { window.dispatchEvent(new Event('appinstalled')) })
+    expect(result.current.canPrompt).toBe(false)
+  })
+
+  it('keeps an event that fired before the hook mounted', () => {
+    mockEnv()
+    const evt = Object.assign(new Event('beforeinstallprompt', { cancelable: true }), { prompt: vi.fn().mockResolvedValue(undefined) })
+    window.dispatchEvent(evt)
+    expect(evt.defaultPrevented).toBe(true)
+    expect(renderHook(() => useInstall()).result.current.canPrompt).toBe(true)
+  })
+
+  it('clears the stored event even when prompt() rejects, without throwing', async () => {
+    mockEnv()
+    const evt = Object.assign(new Event('beforeinstallprompt', { cancelable: true }), { prompt: vi.fn().mockRejectedValue(new Error('x')) })
+    window.dispatchEvent(evt)
+    const { result } = renderHook(() => useInstall())
+    await act(async () => { await result.current.promptInstall() })
     expect(result.current.canPrompt).toBe(false)
   })
 

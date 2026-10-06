@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 
 type Tone = 'info' | 'error'
@@ -21,6 +22,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={{ show }}>
       {children}
+      {createPortal(
       <div className="toast-region">
         <div role="status" aria-live="polite">
           {toast?.tone === 'info' && <p className="toast">{toast.message}</p>}
@@ -28,7 +30,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <div role="alert">
           {toast?.tone === 'error' && <p className="toast toast--error">{toast.message}</p>}
         </div>
-      </div>
+      </div>,
+      document.body,
+      )}
     </Ctx.Provider>
   )
 }

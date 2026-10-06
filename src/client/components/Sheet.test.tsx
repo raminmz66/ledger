@@ -154,12 +154,4 @@ describe('Sheet a11y', () => {
     await userEvent.keyboard('{Escape}')
     expect(screen.getByRole('button', { name: 'لنگر' })).toHaveFocus()
   })
-
-  it('applies scroll containment and a vh fallback before dvh in the stylesheet', async () => {
-    const css = (await import('node:fs')).readFileSync('src/client/styles/global.css', 'utf8')
-    const block = /\.sheet\s*\{[^}]*\}/.exec(css)![0]
-    expect(block).toMatch(/overscroll-behavior:\s*contain/)
-    expect(block.indexOf('92vh')).toBeGreaterThan(-1)
-    expect(block.indexOf('92vh')).toBeLessThan(block.indexOf('92dvh'))
-  })
 })

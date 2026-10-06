@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
+import { Fragment, useEffect, useRef, useState, type FormEvent, type RefObject } from 'react'
 import { api } from '../api'
 import copy from '../copy'
 import { formatGregorianToJalali, formatJalali, todayGregorian } from '../dates/jalali'
@@ -18,7 +18,7 @@ import { useToast } from './Toast'
 export type TransactionSheetProps = (
   | { mode: 'add'; direction: Direction }
   | { mode: 'edit'; tx: Tx }
-) & { open: boolean; personId: string; personName: string; onClose: () => void; onSaved: () => void }
+) & { open: boolean; personId: string; personName: string; onClose: () => void; onSaved: () => void; returnFocusRef?: RefObject<HTMLElement | null> }
 
 const yesterday = () => dayjs(todayGregorian()).subtract(1, 'day').format('YYYY-MM-DD')
 
@@ -90,7 +90,7 @@ export function TransactionSheet(props: TransactionSheetProps) {
 
   return (
     <Fragment>
-      <Sheet open={open} title={tx ? copy.txSheet.editTitle : `${copy.txSheet.addTitle} ${personName}`} onClose={onClose} busy={busy}>
+      <Sheet open={open} title={tx ? copy.txSheet.editTitle : `${copy.txSheet.addTitle} ${personName}`} onClose={onClose} busy={busy} returnFocusRef={props.returnFocusRef}>
         <form ref={form} className="sheet-form" onSubmit={submit} noValidate>
           <SegmentedControl
             options={[{ value: 'paid', label: copy.person.paidButton }, { value: 'received', label: copy.person.receivedButton }]}

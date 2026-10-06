@@ -21,11 +21,21 @@ describe('response headers', () => {
     expect(res.headers.get('cache-control')).toBe('no-store')
   })
 
-  it('also applies to error responses produced by the CSRF middleware and by onError', async () => {
+  it('also applies to error responses produced by the CSRF middleware', async () => {
     const csrf = await get('/api/auth/verify', { method: 'POST', headers: { 'content-type': 'text/plain', origin: 'https://evil.example' }, body: '{}' })
     expect(csrf.status).toBe(403)
     expect(csrf.headers.get('x-content-type-options')).toBe('nosniff')
     expect(csrf.headers.get('cache-control')).toBe('no-store')
+  })
+
+  it('keeps the headers on the 500 produced by onError', async () => {
+    const res = await app.request('/api/me', { headers: { cookie: 'sid=x' } }, {
+      DB: { prepare() { throw new Error('boom') } }, SESSION_SECRET: 's', RESEND_API_KEY: 'r', EMAIL_FROM: 'x',
+    })
+    expect(res.status).toBe(500)
+    expect(await res.json()).toEqual({ error: 'internal' })
+    expect(res.headers.get('x-content-type-options')).toBe('nosniff')
+    expect(res.headers.get('cache-control')).toBe('no-store')
   })
 
   it('does not break the cookie headers set by auth routes', async () => {
