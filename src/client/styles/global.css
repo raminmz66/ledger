@@ -532,3 +532,6 @@ html {
   margin-block: auto 0;
   padding-block: 2rem 1rem;
 }
+
+.total-amount { display: flex; align-items: baseline; gap: 0.35rem; }
+.total-unit { color: var(--muted); font-size: var(--text-meta); }
