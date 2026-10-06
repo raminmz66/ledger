@@ -5,6 +5,8 @@ import type { AppEnv } from './env'
 import { cleanupExpired } from './lib/cleanup'
 import { requireAuth } from './middleware/require-auth'
 import { auth } from './routes/auth'
+import { people } from './routes/people'
+import { transactions } from './routes/transactions'
 
 export const app = new Hono<AppEnv>()
 
@@ -12,6 +14,8 @@ app.use('/api/*', csrf())
 
 app.get('/api/health', (c) => c.json({ ok: true }))
 app.route('/api/auth', auth)
+app.route('/api/people', people)
+app.route('/api/transactions', transactions)
 
 app.get('/api/me', requireAuth, async (c) => {
   const row = await c.env.DB.prepare('SELECT email FROM users WHERE id = ?')

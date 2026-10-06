@@ -164,7 +164,7 @@ All JSON; errors are `{ "error": "<code>" }` with a matching HTTP status. The cl
 - `amount`: integer, 1 to 1,000,000,000,000 Toman.
 - `date`: valid `YYYY-MM-DD`. Future dates allowed.
 - `note`: optional, trimmed, ≤200 chars, empty → `null`.
-- Persian/Arabic digits normalized to Latin before parsing; Arabic «ي/ك» normalized to «ی/ک» in names and notes.
+- Persian/Arabic digits are normalized to Latin by the client before sending (the server expects Latin `YYYY-MM-DD` and numeric JSON amounts); Arabic «ي/ك» are normalized to «ی/ک» in names and notes by the server, which also strips invisible edge characters.
 
 ## 6. Screens and flow
 
@@ -238,8 +238,8 @@ Interaction rules:
 | M0 Design | This spec, mockups, icon, tracking files | User approves the spec |
 | M1 Skeleton | Public repo, Worker + assets, D1 migration, Vazirmatn/RTL shell, tokens, icons, manifest, first deploy | Installable empty shell live on Cloudflare |
 | M2 Auth | Email code, Resend, rate limits, sessions, login screens, cron cleanup | Sign in/out works on a phone; limits tested |
-| M3 Data | People + transactions API and forms (add/edit/delete, Jalali date, note) | CRUD works end to end with user isolation tests |
-| M4 Overviews | Home totals + list, person page with balance and grouped history | Matches mockups 3–4 on a phone |
+| M3 Data API | People + transactions API, balances and totals, user isolation tests, shared client 401 handler (forms moved to M4) | Isolation and validation tests pass; deployed |
+| M4 Screens | Home list with totals, person page with grouped history, transaction and person sheets, Jalali calendar, edit/delete flows | Matches mockups 3–9 on a phone |
 | M5 Polish | Empty/error states, toasts, install hints, copy lint, README deploy guide, phone smoke test | v1 tagged |
 
 ## 13. Open items (do not block the spec)

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { api } from '../api'
+import { api, AUTH_EXPIRED } from '../api'
 
 type Status = 'loading' | 'anon' | 'authed'
 type AuthValue = {
@@ -24,6 +24,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       )
     })
     return () => { alive = false }
+  }, [])
+
+  useEffect(() => {
+    const onExpired = () => setState({ status: 'anon', email: null })
+    window.addEventListener(AUTH_EXPIRED, onExpired)
+    return () => window.removeEventListener(AUTH_EXPIRED, onExpired)
   }, [])
 
   const setAuthed = useCallback((email: string) => setState({ status: 'authed', email }), [])
