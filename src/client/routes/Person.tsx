@@ -84,7 +84,9 @@ export default function Person() {
         <BackButton fallbackTo="/" />
         <h1 className="person-name"><bdi>{data.name}</bdi></h1>
         <div className="person-menu" ref={menuRef}>
-          <button type="button" ref={menuBtn} className="icon-link" aria-label={copy.person.menu} aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)}>⋯</button>
+          <button type="button" ref={menuBtn} className="icon-link" aria-label={copy.person.menu} aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)}>
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><circle cx="5" cy="12" r="2" fill="currentColor" /><circle cx="12" cy="12" r="2" fill="currentColor" /><circle cx="19" cy="12" r="2" fill="currentColor" /></svg>
+          </button>
           {menuOpen && (
             <div className="card menu-pop">
               <button type="button" className="menu-item" onClick={() => { setMenuOpen(false); setRenaming(true) }}>{copy.person.rename}</button>
