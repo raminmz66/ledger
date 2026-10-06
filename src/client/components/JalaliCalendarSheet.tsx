@@ -46,10 +46,10 @@ export function JalaliCalendarSheet({ open, value, onPick, onClose }: JalaliCale
   return (
     <Sheet open={open} title={copy.calendar.title} onClose={onClose}>
       <div className="jalali-date-nav">
-        {/* PAT order kept: first DOM button = next month. */}
-        <button type="button" aria-label={copy.calendar.nextMonth} onClick={() => setViewMonth(shiftJalaliMonth(viewMonth, 1))}>‹</button>
-        <span>{jalaliMonthLabel(viewMonth)}</span>
+        {/* RTL: the first DOM child sits on the visual right, so previous comes first. */}
         <button type="button" aria-label={copy.calendar.prevMonth} onClick={() => setViewMonth(shiftJalaliMonth(viewMonth, -1))}>›</button>
+        <span>{jalaliMonthLabel(viewMonth)}</span>
+        <button type="button" aria-label={copy.calendar.nextMonth} onClick={() => setViewMonth(shiftJalaliMonth(viewMonth, 1))}>‹</button>
       </div>
       <div className="jalali-date-weekdays">
         {WEEKDAYS.map((d) => <span key={d}>{d}</span>)}

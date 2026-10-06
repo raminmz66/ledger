@@ -212,8 +212,8 @@ html {
 .toast {
   position: fixed;
   inset-inline: 16px;
-  inset-block-end: calc(5rem + env(safe-area-inset-bottom));
-  z-index: 30;
+  inset-block-start: calc(0.75rem + env(safe-area-inset-top));
+  z-index: 60;
   inline-size: fit-content;
   max-inline-size: calc(100% - 32px);
   margin-inline: auto;
@@ -443,6 +443,7 @@ html {
   inset-inline-end: 0;
   z-index: 5;
   min-inline-size: 12rem;
+  max-inline-size: 90vw;
   padding: 0.25rem;
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
 }
@@ -461,6 +462,7 @@ html {
 }
 .menu-item--danger { color: var(--danger); }
 .menu-item--danger.confirm-press--armed { background: var(--danger); color: #fff; border-radius: 8px; }
+.menu-pop:has(.menu-warn) { inline-size: 16rem; max-inline-size: 90vw; }
 .menu-warn { margin: 0.25rem 0.75rem 0.5rem; color: var(--danger); font-size: var(--text-meta); }
 .balance-block { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding-block: 1.5rem; }
 .balance-amount { font-size: 2rem; }

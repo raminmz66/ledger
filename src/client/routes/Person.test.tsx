@@ -78,6 +78,13 @@ describe('Person page', () => {
     expect(rows[1]).toHaveTextContent(copy.person.received)
   })
 
+  it('isolates signed amounts as LTR so the sign stays left of the digits', async () => {
+    stubApi({ 'GET /api/people/p1': { status: 200, body: detail } })
+    renderPerson()
+    await screen.findByRole('heading', { name: 'علی رضایی' })
+    expect(screen.getByText('+۵۰۰٬۰۰۰')).toHaveAttribute('dir', 'ltr')
+  })
+
   it('shows the empty-history message', async () => {
     stubApi({ 'GET /api/people/p1': { status: 200, body: { ...detail, balance: 0, transactions: [] } } })
     renderPerson()

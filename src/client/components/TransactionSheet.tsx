@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Fragment, useEffect, useState, type FormEvent } from 'react'
+import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
 import { api } from '../api'
 import copy from '../copy'
 import { formatGregorianToJalali, formatJalali, todayGregorian } from '../dates/jalali'
@@ -37,6 +37,12 @@ export function TransactionSheet(props: TransactionSheetProps) {
   const [calendar, setCalendar] = useState(false)
   const toast = useToast()
   const txId = tx?.id
+  const form = useRef<HTMLFormElement>(null)
+
+  // Runs after Sheet's own first-focusable focus (child effects run first).
+  useEffect(() => {
+    if (open) form.current?.querySelector<HTMLInputElement>('input[inputmode="numeric"]')?.focus()
+  }, [open, txId])
 
   useEffect(() => {
     if (!open) return
@@ -87,7 +93,7 @@ export function TransactionSheet(props: TransactionSheetProps) {
   return (
     <Fragment>
       <Sheet open={open} title={tx ? copy.txSheet.editTitle : `${copy.txSheet.addTitle} ${personName}`} onClose={onClose} busy={busy}>
-        <form className="sheet-form" onSubmit={submit} noValidate>
+        <form ref={form} className="sheet-form" onSubmit={submit} noValidate>
           <SegmentedControl
             options={[{ value: 'paid', label: copy.person.paidButton }, { value: 'received', label: copy.person.receivedButton }]}
             value={direction}

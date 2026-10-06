@@ -110,7 +110,7 @@ export default function Person() {
               {g.items.map((t) => (
                 <button key={t.id} type="button" className="list-row tx-row" onClick={() => setTxSheet({ mode: 'edit', tx: t })}>
                   <span>{t.direction === 'paid' ? copy.person.paid : copy.person.received}{t.note ? ` · ${t.note}` : ''}</span>
-                  <span className={t.direction === 'paid' ? 'is-owed' : 'is-owe'}>{signedToman(t.direction, t.amount)}</span>
+                  <bdi dir="ltr" className={t.direction === 'paid' ? 'is-owed' : 'is-owe'}>{signedToman(t.direction, t.amount)}</bdi>
                 </button>
               ))}
             </div>

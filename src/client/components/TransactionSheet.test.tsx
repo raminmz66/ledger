@@ -19,6 +19,11 @@ const wrap = (ui: React.ReactElement) => render(<ToastProvider>{ui}</ToastProvid
 const addProps = { open: true, personId: 'p1', personName: 'علی', mode: 'add' as const, onClose: () => {}, onSaved: () => {} }
 
 describe('TransactionSheet add', () => {
+  it('focuses the amount field on open', () => {
+    wrap(<TransactionSheet {...addProps} direction="paid" />)
+    expect(screen.getByLabelText(copy.txSheet.amountLabel)).toHaveFocus()
+  })
+
   it('shows the person in the title, preselects the direction and today, and writes the amount in words', async () => {
     wrap(<TransactionSheet {...addProps} direction="received" />)
     expect(screen.getByRole('dialog', { name: new RegExp('علی') })).toBeInTheDocument()

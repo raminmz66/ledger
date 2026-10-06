@@ -17,6 +17,13 @@ describe('JalaliCalendarSheet', () => {
     expect(weekdays).toEqual(['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'])
   })
 
+  it('puts previous before next in the DOM (RTL: first child is visually right)', () => {
+    render(<JalaliCalendarSheet open value="2026-10-06" onPick={() => {}} onClose={() => {}} />)
+    const prev = screen.getByRole('button', { name: copy.calendar.prevMonth })
+    const next = screen.getByRole('button', { name: copy.calendar.nextMonth })
+    expect(prev.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('picking a day returns the exact Gregorian date and closes', async () => {
     const onPick = vi.fn()
     const onClose = vi.fn()
