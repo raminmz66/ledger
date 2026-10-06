@@ -7,6 +7,7 @@ export type ConfirmPressProps = {
   disabled?: boolean
   className?: string
   armTimeoutMs?: number
+  onArmedChange?: (armed: boolean) => void
 }
 
 export function ConfirmPress({
@@ -16,6 +17,7 @@ export function ConfirmPress({
   disabled = false,
   className,
   armTimeoutMs = 3000,
+  onArmedChange,
 }: ConfirmPressProps) {
   const [armed, setArmed] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -33,6 +35,11 @@ export function ConfirmPress({
   }
 
   useEffect(() => () => clearTimer(), [])
+
+  useEffect(() => {
+    onArmedChange?.(armed)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- notify only on armed change
+  }, [armed])
 
   useEffect(() => {
     if (disabled) disarm()
