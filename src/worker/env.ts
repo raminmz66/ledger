@@ -1,0 +1,5 @@
+export type Env = {
+  DB: D1Database
+  ASSETS: Fetcher
+  SESSION_SECRET: string
+}
