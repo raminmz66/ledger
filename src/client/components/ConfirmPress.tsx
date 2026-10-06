@@ -73,7 +73,6 @@ export function ConfirmPress({
       className={classes}
       onClick={handleClick}
       disabled={disabled}
-      aria-expanded={armed}
     >
       {armed ? confirmLabel : label}
     </button>

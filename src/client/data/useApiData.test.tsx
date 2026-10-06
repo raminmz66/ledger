@@ -33,11 +33,18 @@ describe('useApiData', () => {
     expect(result.current.error).toBe(copy.errors.network)
   })
 
-  it('does nothing for a null path', () => {
-    const f = vi.fn()
-    vi.stubGlobal('fetch', f)
-    const { result } = renderHook(() => useApiData(null))
-    expect(result.current.status).toBe('loading')
-    expect(f).not.toHaveBeenCalled()
+  it('ignores a stale response that resolves after a newer one', async () => {
+    let n = 0
+    const resolvers: ((r: Response) => void)[] = []
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((res) => { n++; resolvers.push(res) })))
+    const { result } = renderHook(() => useApiData<{ n: number }>('/api/x'))
+    await waitFor(() => expect(n).toBe(1))
+    let second!: Promise<void>
+    act(() => { second = result.current.reload() })
+    await waitFor(() => expect(n).toBe(2))
+    const ok = (v: number) => new Response(JSON.stringify({ n: v }), { status: 200 })
+    await act(async () => { resolvers[1]!(ok(2)); await second })
+    await act(async () => { resolvers[0]!(ok(1)); await Promise.resolve() })
+    expect(result.current.data).toEqual({ n: 2 })
   })
 })

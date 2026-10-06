@@ -21,11 +21,14 @@ type TxSheetState = { mode: 'add'; direction: Direction } | { mode: 'edit'; tx: 
 
 export default function Person() {
   const { id = '' } = useParams()
-  const { status, data, error, httpStatus, reload } = useApiData<PersonDetail>(`/api/people/${id}`)
+  const eid = encodeURIComponent(id)
+  const { status, data, error, httpStatus, reload } = useApiData<PersonDetail>(`/api/people/${eid}`)
   const [txSheet, setTxSheet] = useState<TxSheetState>(null)
   const [renaming, setRenaming] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [armed, setArmed] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const menuBtn = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const toast = useToast()
@@ -33,7 +36,7 @@ export default function Person() {
   useEffect(() => {
     if (!menuOpen) return
     const onDown = (e: PointerEvent) => { if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false) }
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false) }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setMenuOpen(false); menuBtn.current?.focus() } }
     document.addEventListener('pointerdown', onDown)
     document.addEventListener('keydown', onKey)
     return () => { document.removeEventListener('pointerdown', onDown); document.removeEventListener('keydown', onKey) }
@@ -65,10 +68,15 @@ export default function Person() {
   const label = kind === 'owed' ? copy.person.owedToMe : kind === 'owe' ? copy.person.iOwe : copy.person.settled
 
   async function remove() {
-    const res = await api('DELETE', `/api/people/${id}`)
-    if (!res.ok) return toast.show(errorMessage(res as { status: number; data: { error?: string } | null }))
+    if (deleting) return
+    setDeleting(true)
+    const res = await api('DELETE', `/api/people/${eid}`)
+    if (!res.ok) {
+      setDeleting(false)
+      return toast.show(errorMessage(res as { status: number; data: { error?: string } | null }))
+    }
     toast.show(copy.toast.deleted)
-    navigate('/')
+    navigate('/', { replace: true })
   }
 
   return (
@@ -77,18 +85,25 @@ export default function Person() {
         <BackButton fallbackTo="/" />
         <h1 className="person-name"><bdi>{data.name}</bdi></h1>
         <div className="person-menu" ref={menuRef}>
-          <button type="button" className="icon-link" aria-label={copy.person.menu} aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)}>⋯</button>
+          <button type="button" ref={menuBtn} className="icon-link" aria-label={copy.person.menu} aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)}>⋯</button>
           {menuOpen && (
             <div className="card menu-pop">
               <button type="button" className="menu-item" onClick={() => { setMenuOpen(false); setRenaming(true) }}>{copy.person.rename}</button>
-              <ConfirmPress className="menu-item menu-item--danger" label={copy.person.deletePerson} confirmLabel={copy.person.deleteConfirm} onArmedChange={setArmed} onConfirm={() => void remove()} />
+              <ConfirmPress className="menu-item menu-item--danger" label={copy.person.deletePerson} disabled={deleting} confirmLabel={copy.person.deleteConfirm} onArmedChange={setArmed} onConfirm={() => void remove()} />
               {armed && (
-                <p className="menu-warn">{n === 0 ? copy.person.deleteWarnNone : `«${data.name}» ${copy.person.deleteWarnAnd} ${toFaDigits(n)} ${copy.person.deleteWarnTail}`}</p>
+                <p className="menu-warn">{n === 0 ? copy.person.deleteWarnNone : <>«<bdi>{data.name}</bdi>» {copy.person.deleteWarnAnd} {toFaDigits(n)} {copy.person.deleteWarnTail}</>}</p>
               )}
             </div>
           )}
         </div>
       </header>
+
+      {status === 'error' && (
+        <div className="page-loading">
+          <p className="form-error" role="alert">{error}</p>
+          <button type="button" className="btn btn--ghost" onClick={() => void reload()}>{copy.common.retry}</button>
+        </div>
+      )}
 
       <section className="balance-block">
         <span className={`is-${kind}`}>{label}</span>
@@ -109,7 +124,7 @@ export default function Person() {
             <div className="card">
               {g.items.map((t) => (
                 <button key={t.id} type="button" className="list-row tx-row" onClick={() => setTxSheet({ mode: 'edit', tx: t })}>
-                  <span>{t.direction === 'paid' ? copy.person.paid : copy.person.received}{t.note ? ` · ${t.note}` : ''}</span>
+                  <span>{t.direction === 'paid' ? copy.person.paid : copy.person.received}{t.note && <> · <bdi>{t.note}</bdi></>}</span>
                   <bdi dir="ltr" className={t.direction === 'paid' ? 'is-owed' : 'is-owe'}>{signedToman(t.direction, t.amount)}</bdi>
                 </button>
               ))}
@@ -119,9 +134,9 @@ export default function Person() {
       )}
 
       {txSheet && (
-        <TransactionSheet {...txSheet} open personId={id} personName={data.name} onClose={() => setTxSheet(null)} onSaved={() => void reload()} />
+        <TransactionSheet {...txSheet} open personId={eid} personName={data.name} onClose={() => setTxSheet(null)} onSaved={() => void reload()} />
       )}
-      <PersonSheet mode="rename" open={renaming} personId={id} initialName={data.name} onClose={() => setRenaming(false)} onDone={() => { setRenaming(false); void reload() }} />
+      <PersonSheet mode="rename" open={renaming} personId={eid} initialName={data.name} onClose={() => { setRenaming(false); menuBtn.current?.focus() }} onDone={() => { setRenaming(false); menuBtn.current?.focus(); void reload() }} />
     </main>
   )
 }

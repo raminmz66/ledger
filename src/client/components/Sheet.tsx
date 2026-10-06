@@ -26,7 +26,8 @@ export function Sheet({ open, title, onClose, busy = false, children }: SheetPro
     document.addEventListener('keydown', onKey)
     return () => {
       document.removeEventListener('keydown', onKey)
-      stack.splice(stack.indexOf(token), 1)
+      const i = stack.indexOf(token)
+      if (i >= 0) stack.splice(i, 1)
       opener?.focus()
     }
   }, [open])

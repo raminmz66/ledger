@@ -29,6 +29,12 @@ export default function Home() {
           <button type="button" className="btn btn--ghost" onClick={() => void reload()}>{copy.common.retry}</button>
         </div>
       )}
+      {status === 'error' && data && (
+        <div className="page-loading">
+          <p className="form-error" role="alert">{error}</p>
+          <button type="button" className="btn btn--ghost" onClick={() => void reload()}>{copy.common.retry}</button>
+        </div>
+      )}
       {data && (
         <>
           <div className="totals" data-testid="totals">
@@ -54,7 +60,7 @@ export default function Home() {
         </>
       )}
       <button type="button" className="fab" onClick={() => setAdding(true)}>{copy.home.addPerson}</button>
-      <PersonSheet open={adding} mode="add" onClose={() => setAdding(false)} onDone={(p) => { setAdding(false); navigate(`/people/${p.id}`) }} />
+      <PersonSheet open={adding} mode="add" onClose={() => setAdding(false)} onDone={(p) => { setAdding(false); navigate(`/people/${encodeURIComponent(p.id)}`) }} />
     </main>
   )
 }

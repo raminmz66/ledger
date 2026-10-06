@@ -37,7 +37,7 @@ const JALALI_MONTHS = [
 /** Formats a Gregorian ISO date as readable Jalali, e.g. «۱۲ تیر ۱۴۰۴». */
 export function formatJalali(isoDate: string): string {
   const d = dayjs(isoDate).calendar('jalali')
-  const day = d.date().toLocaleString('fa-IR')
+  const day = toFaDigits(d.date())
   const month = JALALI_MONTHS[d.month()]
   const year = toFaDigits(d.year())
   return `${day} ${month} ${year}`

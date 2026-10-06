@@ -69,7 +69,7 @@ describe('Person page', () => {
     const groups = screen.getAllByTestId('day-group')
     expect(groups).toHaveLength(2)
     expect(within(groups[0]!).getByText('۱۴ مهر ۱۴۰۵')).toBeInTheDocument() // 2026-10-06
-    expect(within(groups[1]!).getByText(/مهر ۱۴۰۵|شهریور ۱۴۰۵/)).toBeInTheDocument()
+    expect(within(groups[1]!).getByText('۲۹ شهریور ۱۴۰۵')).toBeInTheDocument()
     const rows = within(groups[0]!).getAllByRole('button')
     expect(rows).toHaveLength(2)
     expect(rows[0]).toHaveTextContent('+۵۰۰٬۰۰۰')
@@ -186,5 +186,54 @@ describe('Person page', () => {
     renderPerson()
     const heading = await screen.findByRole('heading', { name: 'John Smith' })
     expect(heading.querySelector('bdi')).not.toBeNull()
+  })
+
+  it('ignores a second delete tap while the DELETE is in flight', async () => {
+    let release!: () => void
+    const gate = new Promise<void>((r) => { release = r })
+    let deletes = 0
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, init?: RequestInit) => {
+      if ((init?.method ?? 'GET') === 'DELETE') { deletes++; await gate; return new Response(null, { status: 204 }) }
+      return new Response(JSON.stringify(detail), { status: 200 })
+    }))
+    renderPerson()
+    await screen.findByRole('heading', { name: 'علی رضایی' })
+    await userEvent.click(screen.getByRole('button', { name: copy.person.menu }))
+    await userEvent.click(screen.getByRole('button', { name: copy.person.deletePerson }))
+    await userEvent.click(screen.getByRole('button', { name: copy.person.deleteConfirm }))
+    // in flight: the row is disabled, so further taps are ignored
+    await userEvent.click(screen.getByRole('button', { name: copy.person.deletePerson }))
+    release()
+    expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
+    expect(deletes).toBe(1)
+  })
+
+  it('shows the error and re-enables delete when the DELETE fails', async () => {
+    stubApi({
+      'GET /api/people/p1': { status: 200, body: detail },
+      'DELETE /api/people/p1': { status: 500, body: { error: 'internal' } },
+    })
+    renderPerson()
+    await screen.findByRole('heading', { name: 'علی رضایی' })
+    await userEvent.click(screen.getByRole('button', { name: copy.person.menu }))
+    await userEvent.click(screen.getByRole('button', { name: copy.person.deletePerson }))
+    await userEvent.click(screen.getByRole('button', { name: copy.person.deleteConfirm }))
+    expect(await screen.findByText(copy.errors.internal)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: copy.person.deletePerson })).toBeEnabled()
+  })
+
+  it('keeps showing the old data with an error and retry when a refetch after saving fails', async () => {
+    stubApi({
+      'GET /api/people/p1': [{ status: 200, body: detail }, { status: 500, body: { error: 'internal' } }],
+      'POST /api/people/p1/transactions': { status: 201, body: { id: 'tNew' } },
+    })
+    renderPerson()
+    await screen.findByRole('heading', { name: 'علی رضایی' })
+    await userEvent.click(screen.getByRole('button', { name: copy.person.paidButton }))
+    await userEvent.type(screen.getByLabelText(copy.txSheet.amountLabel), '100')
+    await userEvent.click(screen.getByRole('button', { name: copy.txSheet.save }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.internal)
+    expect(screen.getByRole('button', { name: copy.common.retry })).toBeInTheDocument()
+    expect(screen.getByTestId('balance')).toHaveTextContent('۸٬۰۰۰٬۰۰۰')
   })
 })

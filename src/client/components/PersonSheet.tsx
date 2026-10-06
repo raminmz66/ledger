@@ -44,7 +44,7 @@ export function PersonSheet(props: PersonSheetProps) {
       <form className="sheet-form" onSubmit={submit} noValidate>
         <label className="field">
           {copy.personSheet.nameLabel}
-          <input type="text" value={name} autoComplete="off" onChange={(e) => setName(e.target.value)} />
+          <input type="text" dir="auto" value={name} autoComplete="off" onChange={(e) => setName(e.target.value)} />
         </label>
         {error && <p className="form-error" role="alert">{error}</p>}
         <button className="btn" type="submit" disabled={busy}>

@@ -97,6 +97,7 @@ export function TransactionSheet(props: TransactionSheetProps) {
           <SegmentedControl
             options={[{ value: 'paid', label: copy.person.paidButton }, { value: 'received', label: copy.person.receivedButton }]}
             value={direction}
+            name={copy.txSheet.directionLabel}
             onChange={setDirection}
             disabled={busy}
           />
@@ -118,7 +119,7 @@ export function TransactionSheet(props: TransactionSheetProps) {
           </div>
           <label className="field">
             {copy.txSheet.noteLabel}
-            <input type="text" value={note} placeholder={copy.txSheet.notePlaceholder} disabled={busy} autoComplete="off" onChange={(e) => setNote(e.target.value)} />
+            <input type="text" dir="auto" value={note} placeholder={copy.txSheet.notePlaceholder} disabled={busy} autoComplete="off" onChange={(e) => setNote(e.target.value)} />
           </label>
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="btn" type="submit" disabled={busy}>{tx ? copy.txSheet.saveChanges : copy.txSheet.save}</button>
