@@ -388,3 +388,47 @@ html {
 .row-name { font-weight: 700; }
 
 .sheet-form { display: flex; flex-direction: column; gap: 0.75rem; }
+
+/* Jalali calendar sheet (ported from PAT) and transaction sheet */
+.jalali-date-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: var(--text-status);
+}
+.jalali-date-nav button {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-title);
+  cursor: pointer;
+}
+.jalali-date-weekdays,
+.jalali-date-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+.jalali-date-weekdays { color: var(--muted); font-size: var(--text-meta); }
+.jalali-date-day {
+  min-block-size: 44px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-status);
+  cursor: pointer;
+}
+.jalali-date-day--muted { opacity: 0.35; }
+.jalali-date-day--today { border-color: var(--accent); }
+.jalali-date-day--selected { background: var(--accent); color: #fff; font-weight: 700; opacity: 1; }
+.amount-words { margin: 0; color: var(--muted); font-size: var(--text-meta); }
+.date-jalali { color: var(--muted); font-size: var(--text-meta); }
+.btn--danger { color: var(--danger); border-color: var(--danger); }
+.btn--danger.confirm-press--armed { background: var(--danger); color: var(--page); }
