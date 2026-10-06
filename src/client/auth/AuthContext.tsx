@@ -6,7 +6,7 @@ type AuthValue = {
   status: Status
   email: string | null
   setAuthed(email: string): void
-  logout(): Promise<void>
+  logout(): Promise<boolean>
 }
 
 const AuthContext = createContext<AuthValue | null>(null)
@@ -18,15 +18,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let alive = true
     api<{ email: string }>('GET', '/api/me').then((r) => {
       if (!alive) return
-      setState(r.ok && r.data ? { status: 'authed', email: r.data.email } : { status: 'anon', email: null })
+      // Never overwrite a sign-in that completed while /api/me was in flight.
+      setState((prev) =>
+        prev.status === 'authed' ? prev : r.ok && r.data ? { status: 'authed', email: r.data.email } : { status: 'anon', email: null },
+      )
     })
     return () => { alive = false }
   }, [])
 
   const setAuthed = useCallback((email: string) => setState({ status: 'authed', email }), [])
   const logout = useCallback(async () => {
-    await api('POST', '/api/auth/logout')
+    const r = await api('POST', '/api/auth/logout')
+    if (!r.ok) return false
     setState({ status: 'anon', email: null })
+    return true
   }, [])
 
   const value = useMemo(() => ({ ...state, setAuthed, logout }), [state, setAuthed, logout])

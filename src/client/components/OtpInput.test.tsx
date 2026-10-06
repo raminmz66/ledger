@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import OtpInput from './OtpInput'
@@ -43,8 +43,18 @@ describe('OtpInput', () => {
     render(<OtpInput onComplete={() => {}} />)
     await userEvent.click(boxes()[0]!)
     await userEvent.keyboard('12')
-    await userEvent.keyboard('{Backspace}{Backspace}')
+    await userEvent.keyboard('{Backspace}')
     expect(boxes().map((b) => b.value).join('')).toBe('1')
+    await userEvent.keyboard('{Backspace}')
+    expect(boxes().map((b) => b.value).join('')).toBe('')
+  })
+
+  it('treats a multi-character value in one box (autofill) like a paste', async () => {
+    const onComplete = vi.fn()
+    render(<OtpInput onComplete={onComplete} />)
+    fireEvent.change(boxes()[0]!, { target: { value: '481209' } })
+    expect(boxes().map((b) => b.value).join('')).toBe('481209')
+    expect(onComplete).toHaveBeenCalledWith('481209')
   })
 
   it('clears when resetKey changes', async () => {

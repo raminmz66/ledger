@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 import { api } from '../api'
 import { useAuth } from '../auth/AuthContext'
@@ -19,7 +19,7 @@ export default function Login() {
   const [seconds, setSeconds] = useState(0)
   const [canResend, setCanResend] = useState(false)
   const [resetKey, setResetKey] = useState(0)
-  const code = useRef('')
+  const [typed, setTyped] = useState('')
 
   useEffect(() => {
     if (seconds <= 0) return
@@ -39,20 +39,18 @@ export default function Login() {
       setStep('code')
       setSeconds(60)
       setCanResend(false)
-      code.current = ''
       setResetKey((k) => k + 1)
     } else if (r.status === 0) setError(t.errNetwork)
     else if (r.status === 429) {
       const wait = r.data?.retryAfter ?? 60
       setError(wait <= 60 ? t.errWaitSeconds : t.errRateLimited)
-      if (step === 'code') setSeconds(wait)
+      if (step === 'code') { setSeconds(wait); setCanResend(false) }
     } else if (r.data?.error === 'invalid_email') setError(t.errInvalidEmail)
     else if (r.data?.error === 'email_failed') setError(t.errEmailFailed)
-    else setError(t.errNetwork)
+    else setError(t.errGeneric)
   }
 
   async function verify(value: string) {
-    code.current = value
     setBusy(true)
     setError('')
     const r = await api<Err>('POST', '/api/auth/verify', { email: email.trim(), code: value })
@@ -62,7 +60,6 @@ export default function Login() {
       navigate('/', { replace: true })
       return
     }
-    code.current = ''
     setResetKey((k) => k + 1)
     const d = r.data
     if (r.status === 0) setError(t.errNetwork)
@@ -73,14 +70,14 @@ export default function Login() {
       const left = d.attemptsLeft ?? 0
       setError(`${t.errWrongCode} ${t.errAttemptsLeft} ${toFaDigits(left)}`)
       if (left === 0) setCanResend(true)
-    } else setError(t.errNetwork)
+    } else setError(t.errGeneric)
   }
 
   return (
     <main className="page">
       <h1 className="wordmark">{t.title}</h1>
       {step === 'email' ? (
-        <form className="auth-card" onSubmit={sendCode}>
+        <form className="auth-card" onSubmit={sendCode} noValidate>
           <label className="field">
             <span>{t.emailLabel}</span>
             <input
@@ -101,9 +98,9 @@ export default function Login() {
         <div className="auth-card">
           <p className="auth-title">{t.codeTitle}</p>
           <p className="tagline">{t.codeSentTo} <bdi>{email}</bdi></p>
-          <OtpInput disabled={busy} onComplete={verify} resetKey={resetKey} />
+          <OtpInput disabled={busy} onChange={setTyped} onComplete={verify} resetKey={resetKey} />
           {error && <p className="form-error" role="alert">{error}</p>}
-          <button className="btn" type="button" disabled={busy || !code.current} onClick={() => verify(code.current)}>
+          <button className="btn" type="button" disabled={busy || typed.length < 6} onClick={() => verify(typed)}>
             {busy ? t.verifying : t.verify}
           </button>
           {seconds > 0 && !canResend ? (

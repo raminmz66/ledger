@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react'
+import copy from '../copy'
 import { toFaDigits, toLatinDigits } from '../format/digits'
 
-type Props = { length?: number; disabled?: boolean; onComplete(code: string): void; resetKey?: number }
+type Props = { length?: number; disabled?: boolean; onComplete(code: string): void; onChange?(code: string): void; resetKey?: number }
 
-export default function OtpInput({ length = 6, disabled, onComplete, resetKey }: Props) {
+export default function OtpInput({ length = 6, disabled, onComplete, onChange: onCodeChange, resetKey }: Props) {
   const [digits, setDigits] = useState<string[]>(() => Array(length).fill(''))
   const refs = useRef<(HTMLInputElement | null)[]>([])
 
   const commit = (next: string[], focusAt: number) => {
     setDigits(next)
+    onCodeChange?.(next.join(''))
     refs.current[Math.min(focusAt, length - 1)]?.focus()
     // Event handlers run once per user action, so this fires once per fill.
     if (next.every(Boolean)) onComplete(next.join(''))
@@ -16,12 +18,22 @@ export default function OtpInput({ length = 6, disabled, onComplete, resetKey }:
 
   useEffect(() => {
     setDigits(Array(length).fill(''))
+    onCodeChange?.('')
     refs.current[0]?.focus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey, length])
 
+  const fill = (text: string) => {
+    const pasted = toLatinDigits(text).replace(/\D/g, '').slice(0, length)
+    if (!pasted) return
+    commit(Array.from({ length }, (_, i) => pasted[i] ?? ''), pasted.length)
+  }
+
   const onChange = (i: number, raw: string) => {
-    const d = toLatinDigits(raw.slice(-1))
-    if (d === '') return setDigits(digits.map((x, j) => (j === i ? '' : x)))
+    // Autofill can deliver the whole code into one box: treat it like a paste.
+    if (raw.length > 1) return fill(raw)
+    const d = toLatinDigits(raw)
+    if (d === '') return commit(digits.map((x, j) => (j === i ? '' : x)), i)
     if (!/^\d$/.test(d)) return
     const next = [...digits]
     next[i] = d
@@ -30,17 +42,14 @@ export default function OtpInput({ length = 6, disabled, onComplete, resetKey }:
 
   const onPaste = (e: ClipboardEvent) => {
     e.preventDefault()
-    const pasted = toLatinDigits(e.clipboardData.getData('text')).replace(/\D/g, '').slice(0, length)
-    if (!pasted) return
-    commit(Array.from({ length }, (_, i) => pasted[i] ?? ''), pasted.length)
-    if (pasted.length < length) refs.current[pasted.length]?.focus()
+    fill(e.clipboardData.getData('text'))
   }
 
   const onKeyDown = (i: number, e: KeyboardEvent) => {
     if (e.key !== 'Backspace' || digits[i] || i === 0) return
-    // Empty box: step back; the next Backspace clears that box's digit.
+    // Empty box: delete the previous digit and step back.
     e.preventDefault()
-    refs.current[i - 1]?.focus()
+    commit(digits.map((x, j) => (j === i - 1 ? '' : x)), i - 1)
   }
 
   return (
@@ -54,7 +63,7 @@ export default function OtpInput({ length = 6, disabled, onComplete, resetKey }:
           inputMode="numeric"
           autoComplete={i === 0 ? 'one-time-code' : 'off'}
           maxLength={1}
-          aria-label={`رقم ${toFaDigits(i + 1)}`}
+          aria-label={`${copy.signIn.digitLabel} ${toFaDigits(i + 1)}`}
           onChange={(e) => onChange(i, e.target.value)}
           onPaste={onPaste}
           onKeyDown={(e) => onKeyDown(i, e)}
