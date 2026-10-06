@@ -222,6 +222,20 @@ describe('Person page', () => {
     expect(screen.getByRole('button', { name: copy.person.deletePerson })).toBeEnabled()
   })
 
+  it('announces a failed delete in the alert region and stays on the page', async () => {
+    stubApi({
+      'GET /api/people/p1': { status: 200, body: detail },
+      'DELETE /api/people/p1': { status: 500, body: { error: 'internal' } },
+    })
+    renderPerson()
+    await screen.findByRole('heading', { name: 'علی رضایی' })
+    await userEvent.click(screen.getByRole('button', { name: copy.person.menu }))
+    await userEvent.click(screen.getByRole('button', { name: copy.person.deletePerson }))
+    await userEvent.click(screen.getByRole('button', { name: copy.person.deleteConfirm }))
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(copy.errors.internal))
+    expect(screen.queryByText('HOME PAGE')).toBeNull()
+  })
+
   it('keeps showing the old data with an error and retry when a refetch after saving fails', async () => {
     stubApi({
       'GET /api/people/p1': [{ status: 200, body: detail }, { status: 500, body: { error: 'internal' } }],
@@ -232,7 +246,7 @@ describe('Person page', () => {
     await userEvent.click(screen.getByRole('button', { name: copy.person.paidButton }))
     await userEvent.type(screen.getByLabelText(copy.txSheet.amountLabel), '100')
     await userEvent.click(screen.getByRole('button', { name: copy.txSheet.save }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.internal)
+    expect((await screen.findByText(copy.errors.internal)).closest('[role="alert"]')).not.toBeNull()
     expect(screen.getByRole('button', { name: copy.common.retry })).toBeInTheDocument()
     expect(screen.getByTestId('balance')).toHaveTextContent('۸٬۰۰۰٬۰۰۰')
   })

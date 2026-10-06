@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import copy from '../copy'
@@ -74,7 +74,7 @@ describe('TransactionSheet add', () => {
     wrap(<TransactionSheet {...addProps} direction="paid" />)
     if (typed) await userEvent.type(screen.getByLabelText(copy.txSheet.amountLabel), typed)
     await userEvent.click(screen.getByRole('button', { name: copy.txSheet.save }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.invalid_amount)
+    expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(copy.errors.invalid_amount)
     expect(calls).toHaveLength(0)
   })
 
@@ -83,7 +83,7 @@ describe('TransactionSheet add', () => {
     wrap(<TransactionSheet {...addProps} direction="paid" />)
     await userEvent.type(screen.getByLabelText(copy.txSheet.amountLabel), '1000000000001')
     await userEvent.click(screen.getByRole('button', { name: copy.txSheet.save }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.invalid_amount)
+    expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(copy.errors.invalid_amount)
     expect(calls).toHaveLength(0)
   })
 
@@ -93,7 +93,7 @@ describe('TransactionSheet add', () => {
     await userEvent.type(screen.getByLabelText(copy.txSheet.amountLabel), '500')
     const save = screen.getByRole('button', { name: copy.txSheet.save })
     await userEvent.click(save)
-    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.not_found)
+    expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(copy.errors.not_found)
     expect(screen.getByLabelText(copy.txSheet.amountLabel)).toHaveValue('۵۰۰')
     expect(save).toBeEnabled()
   })

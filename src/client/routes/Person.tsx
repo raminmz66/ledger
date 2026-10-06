@@ -73,7 +73,7 @@ export default function Person() {
     const res = await api('DELETE', `/api/people/${eid}`)
     if (!res.ok) {
       setDeleting(false)
-      return toast.show(errorMessage(res as { status: number; data: { error?: string } | null }))
+      return toast.show(errorMessage(res as { status: number; data: { error?: string } | null }), 'error')
     }
     toast.show(copy.toast.deleted)
     navigate('/', { replace: true })
