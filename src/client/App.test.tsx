@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import copy from './copy'
+import { stubApi } from './test/stub-api'
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -24,9 +25,10 @@ describe('App shell', () => {
   })
 
   it('shows the wordmark on / when signed in', async () => {
-    stubMe(200, '{"email":"me@b.co"}')
+    stubApi({ 'GET /api/me': { status: 200, body: { email: 'me@b.co' } }, 'GET /api/people': { status: 200, body: { totals: { owedToMe: 0, iOwe: 0 }, people: [] } } })
     window.history.pushState({}, '', '/')
     render(<App />)
     expect(await screen.findByRole('heading', { name: copy.appName })).toBeInTheDocument()
+    expect(await screen.findByText(copy.home.emptyTitle)).toBeInTheDocument()
   })
 })
