@@ -184,12 +184,35 @@ describe('verify', () => {
     expect(res.status).toBe(429)
   })
 
-  it('parallel wrong guesses cannot exceed 5 attempts', async () => {
+  it('parallel guesses (19 wrong + the right one last) compare at most 5 times', async () => {
     await post('/api/auth/request-code', { email: 'a@b.co' })
-    const wrong = sent[0]!.code === '000000' ? '111111' : '000000'
-    const results = await Promise.all(Array.from({ length: 8 }, () => post('/api/auth/verify', { email: 'a@b.co', code: wrong })))
-    const wrongCount = (await Promise.all(results.map((r) => r.json()))).filter((b: any) => b.error === 'wrong_code').length
-    expect(wrongCount).toBeLessThanOrEqual(5)
+    const right = sent[0]!.code
+    const wrong = right === '000000' ? '111111' : '000000'
+    const codes = [...Array.from({ length: 19 }, () => wrong), right]
+    const results = await Promise.all(codes.map((code) => post('/api/auth/verify', { email: 'a@b.co', code })))
+    const bodies = await Promise.all(results.map((r) => r.clone().json() as Promise<any>))
+    expect(bodies.filter((b) => b.error !== 'code_expired').length).toBeLessThanOrEqual(5)
+    expect(results.filter((r) => r.status === 200).length).toBeLessThanOrEqual(1)
+  })
+
+  it('rejects cross-site text/plain POSTs (login CSRF) with 403', async () => {
+    await post('/api/auth/request-code', { email: 'a@b.co' })
+    const res = await app.request(
+      'http://app.test/api/auth/verify',
+      { method: 'POST', headers: { 'content-type': 'text/plain', origin: 'https://evil.example' }, body: JSON.stringify({ email: 'a@b.co', code: sent[0]!.code }) },
+      await env(),
+    )
+    expect(res.status).toBe(403)
+  })
+
+  it('returns 500 server_misconfigured without SESSION_SECRET', async () => {
+    const res = await app.request(
+      '/api/auth/request-code',
+      { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'a@b.co' }) },
+      { ...(await env()), SESSION_SECRET: '' },
+    )
+    expect(res.status).toBe(500)
+    expect(await res.json()).toEqual({ error: 'server_misconfigured' })
   })
 })
 
@@ -209,7 +232,7 @@ describe('session', () => {
   it('logout deletes the session so the old cookie stops working', async () => {
     const { cookie } = await login()
     const c = cookie.split(';')[0]!
-    const out = await app.request('/api/auth/logout', { method: 'POST', headers: { cookie: c } }, await env())
+    const out = await app.request('/api/auth/logout', { method: 'POST', headers: { cookie: c, origin: 'http://localhost' } }, await env())
     expect(out.status).toBe(204)
     expect(out.headers.get('set-cookie')).toContain('Max-Age=0')
     expect((await app.request('/api/me', { headers: { cookie: c } }, await env())).status).toBe(401)

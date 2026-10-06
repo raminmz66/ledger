@@ -16,9 +16,10 @@ const HOUR = 3600
 export const auth = new Hono<AppEnv>()
 
 const limited = (retryAfter: number) => ({ error: 'rate_limited', retryAfter })
-const ipOf = (c: { req: { header(n: string): string | undefined } }) => c.req.header('CF-Connecting-IP') ?? 'local'
+const ipOf = (c: { req: { header(n: string): string | undefined } }) => c.req.header('CF-Connecting-IP') || 'local'
 
 auth.post('/request-code', async (c) => {
+  if (!c.env.SESSION_SECRET) return c.json({ error: 'server_misconfigured' }, 500)
   const body = await c.req.json().catch(() => null)
   const email = normalizeEmail(body?.email)
   if (!email) return c.json({ error: 'invalid_email' }, 400)
@@ -50,6 +51,7 @@ auth.post('/request-code', async (c) => {
 })
 
 auth.post('/verify', async (c) => {
+  if (!c.env.SESSION_SECRET) return c.json({ error: 'server_misconfigured' }, 500)
   const body = await c.req.json().catch(() => null)
   const email = normalizeEmail(body?.email)
   const code = normalizeCode(body?.code)
@@ -61,28 +63,27 @@ auth.post('/verify', async (c) => {
   const gate = await isLimited(db, failKey, 30)
   if (!gate.allowed) return c.json(limited(gate.retryAfter), 429)
 
-  const fail = async () => { await hit(db, failKey, 30, HOUR) }
+  // ponytail: check-then-act, a burst can pass the gate; per-code attempts are the hard bound
+  const fail = () => hit(db, failKey, 30, HOUR)
   const nowIso = new Date(Date.now()).toISOString()
-
-  const row = await db.prepare('SELECT code_hash, expires_at FROM login_codes WHERE email = ?')
-    .bind(email).first<{ code_hash: string; expires_at: string }>()
-  if (!row) { await fail(); return c.json({ error: 'code_expired' }, 400) }
-  if (row.expires_at <= nowIso) {
-    await db.prepare('DELETE FROM login_codes WHERE email = ?').bind(email).run()
+  const expired = async () => {
+    await db.prepare('DELETE FROM login_codes WHERE email = ? AND (expires_at <= ? OR attempts >= ?)')
+      .bind(email, nowIso, MAX_ATTEMPTS).run()
     await fail()
     return c.json({ error: 'code_expired' }, 400)
   }
 
+  // Reserve an attempt atomically BEFORE comparing: every guess, right or wrong, uses one slot.
+  const row = await db.prepare(
+    'UPDATE login_codes SET attempts = attempts + 1 WHERE email = ? AND expires_at > ? AND attempts < ? RETURNING code_hash, attempts',
+  ).bind(email, nowIso, MAX_ATTEMPTS).first<{ code_hash: string; attempts: number }>()
+  if (!row) return expired()
+
   const expected = await hmacHex(c.env.SESSION_SECRET, `${email}:${code}`)
   if (!timingSafeEqualHex(expected, row.code_hash)) {
-    const upd = await db.prepare('UPDATE login_codes SET attempts = attempts + 1 WHERE email = ? RETURNING attempts')
-      .bind(email).first<{ attempts: number }>()
-    const attempts = upd?.attempts ?? MAX_ATTEMPTS + 1
-    if (attempts >= MAX_ATTEMPTS) await db.prepare('DELETE FROM login_codes WHERE email = ?').bind(email).run()
+    if (row.attempts >= MAX_ATTEMPTS) await db.prepare('DELETE FROM login_codes WHERE email = ?').bind(email).run()
     await fail()
-    // Row already killed by a concurrent request (or over budget): not a counted guess.
-    if (attempts > MAX_ATTEMPTS) return c.json({ error: 'code_expired' }, 400)
-    return c.json({ error: 'wrong_code', attemptsLeft: Math.max(0, MAX_ATTEMPTS - attempts) }, 400)
+    return c.json({ error: 'wrong_code', attemptsLeft: MAX_ATTEMPTS - row.attempts }, 400)
   }
 
   // Consume atomically: a second concurrent verify with the same code finds no row.
