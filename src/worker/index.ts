@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
+import { secureHeaders } from 'hono/secure-headers'
 import type { AppEnv } from './env'
 import { cleanupExpired } from './lib/cleanup'
 import { requireAuth } from './middleware/require-auth'
@@ -10,6 +11,15 @@ import { transactions } from './routes/transactions'
 
 export const app = new Hono<AppEnv>()
 
+app.use('*', secureHeaders({
+  xFrameOptions: 'DENY',
+  referrerPolicy: 'same-origin',
+  crossOriginOpenerPolicy: 'same-origin',
+}))
+app.use('/api/*', async (c, next) => {
+  await next()
+  c.header('Cache-Control', 'no-store')
+})
 app.use('/api/*', csrf())
 
 app.get('/api/health', (c) => c.json({ ok: true }))
