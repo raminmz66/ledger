@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -67,5 +67,44 @@ describe('Settings', () => {
       </MemoryRouter>,
     )
     expect(await screen.findByText('LOGIN PAGE')).toBeInTheDocument()
+  })
+
+  describe('install section', () => {
+    function renderSettings() {
+      vi.stubGlobal('fetch', vi.fn(async () => new Response('{"email":"me@b.co"}', { status: 200 })))
+      render(
+        <MemoryRouter initialEntries={['/settings']}>
+          <AuthProvider>
+            <Routes>
+              <Route element={<ProtectedRoute />}><Route path="/settings" element={<Settings />} /></Route>
+            </Routes>
+          </AuthProvider>
+        </MemoryRouter>,
+      )
+      return screen.findByText('me@b.co')
+    }
+
+    it('shows an install button when the browser offers a prompt', async () => {
+      await renderSettings()
+      expect(screen.queryByText(copy.install.title)).toBeNull()
+      const prompt = vi.fn().mockResolvedValue(undefined)
+      const evt = Object.assign(new Event('beforeinstallprompt', { cancelable: true }), { prompt, userChoice: Promise.resolve({ outcome: 'accepted' }) })
+      act(() => { window.dispatchEvent(evt) })
+      expect(screen.getByText(copy.install.title)).toBeInTheDocument()
+      await userEvent.click(screen.getByRole('button', { name: copy.install.button }))
+      expect(prompt).toHaveBeenCalledTimes(1)
+    })
+
+    it('renders no install section by default', async () => {
+      await renderSettings()
+      expect(screen.queryByText(copy.install.title)).toBeNull()
+      expect(screen.queryByText(copy.install.iosHint)).toBeNull()
+    })
+
+    it('shows the manual hint on iPhone', async () => {
+      vi.stubGlobal('navigator', { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', platform: 'iPhone', maxTouchPoints: 5 })
+      await renderSettings()
+      expect(screen.getByText(copy.install.iosHint)).toBeInTheDocument()
+    })
   })
 })
