@@ -50,3 +50,120 @@ html {
   font-size: var(--text-status);
   text-align: center;
 }
+
+/* Auth screens */
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auth-title {
+  margin: 0.5rem 0;
+  font-size: var(--text-title);
+  font-weight: 700;
+  text-align: center;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: var(--text-status);
+}
+
+.field input {
+  box-sizing: border-box;
+  min-block-size: 44px;
+  padding-inline: 0.75rem;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font: inherit;
+  font-size: var(--text-action);
+}
+
+.btn {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding-block: 0.5rem;
+  background: var(--accent);
+  color: #fff;
+  border: 1.5px solid var(--accent);
+  border-radius: 12px;
+  font: inherit;
+  font-size: var(--text-action);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--accent);
+}
+
+.otp {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  direction: ltr;
+  margin-block: 0.75rem;
+}
+
+.otp input {
+  box-sizing: border-box;
+  inline-size: 44px;
+  block-size: 52px;
+  padding: 0;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--text-meta);
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  min-block-size: 44px;
+  margin-block-end: 1.5rem;
+  padding-inline: 0.75rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+}
+
+.page-loading {
+  padding: 2rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  color: var(--accent);
+  font-size: var(--text-title);
+  text-decoration: none;
+}
