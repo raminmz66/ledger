@@ -5,13 +5,16 @@ export const MAX_AMOUNT = 1_000_000_000_000
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string }
 export type TxInput = { direction: 'paid' | 'received'; amount: number; date: string; note: string | null }
 
+// JS trim() misses ZWNJ/LRM/RLM/bidi overrides/NUL at the edges; inner ones are kept.
+const strip = (t: string) => t.replace(/^[\p{Cc}\p{Cf}\s]+|[\p{Cc}\p{Cf}\s]+$/gu, '')
+
 export function normalizePersian(text: string): string {
   return text.replaceAll('ي', 'ی').replaceAll('ك', 'ک')
 }
 
 export function parseName(raw: unknown): Result<string> {
   if (typeof raw !== 'string') return { ok: false, error: 'invalid_name' }
-  const name = normalizePersian(raw.trim())
+  const name = normalizePersian(strip(raw))
   if (name.length < 1 || name.length > MAX_NAME) return { ok: false, error: 'invalid_name' }
   return { ok: true, value: name }
 }
@@ -37,7 +40,7 @@ export function parseTransaction(raw: unknown): Result<TxInput> {
   let note: string | null = null
   if (b.note !== undefined && b.note !== null) {
     if (typeof b.note !== 'string') return { ok: false, error: 'invalid_note' }
-    const trimmed = normalizePersian(b.note.trim())
+    const trimmed = normalizePersian(strip(b.note))
     if (trimmed.length > MAX_NOTE) return { ok: false, error: 'invalid_note' }
     note = trimmed === '' ? null : trimmed
   }

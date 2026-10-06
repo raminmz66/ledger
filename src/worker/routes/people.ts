@@ -13,7 +13,7 @@ people.get('/', async (c) => {
     `SELECT p.id, p.name, p.created_at,
             COALESCE(SUM(CASE t.direction WHEN 'paid' THEN t.amount ELSE -t.amount END), 0) AS balance,
             COALESCE(MAX(t.created_at), p.created_at) AS last_activity
-     FROM people p LEFT JOIN transactions t ON t.person_id = p.id
+     FROM people p LEFT JOIN transactions t ON t.person_id = p.id AND t.user_id = p.user_id
      WHERE p.user_id = ?
      GROUP BY p.id
      ORDER BY last_activity DESC, p.id DESC`,
@@ -74,13 +74,11 @@ people.post('/:id/transactions', async (c) => {
   const body = await c.req.json().catch(() => null)
   const tx = parseTransaction(body)
   if (!tx.ok) return c.json({ error: tx.error }, 400)
-  const person = await c.env.DB.prepare('SELECT id FROM people WHERE id = ? AND user_id = ?')
-    .bind(c.req.param('id'), c.var.userId).first()
-  if (!person) return notFound(c)
   const id = crypto.randomUUID()
   const v = tx.value
-  await c.env.DB.prepare(
-    'INSERT INTO transactions (id, user_id, person_id, direction, amount, date, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-  ).bind(id, c.var.userId, c.req.param('id'), v.direction, v.amount, v.date, v.note, new Date().toISOString()).run()
+  const res = await c.env.DB.prepare(
+    'INSERT INTO transactions (id, user_id, person_id, direction, amount, date, note, created_at) SELECT ?, ?, id, ?, ?, ?, ?, ? FROM people WHERE id = ? AND user_id = ?',
+  ).bind(id, c.var.userId, v.direction, v.amount, v.date, v.note, new Date().toISOString(), c.req.param('id'), c.var.userId).run()
+  if (!res.meta.changes) return notFound(c)
   return c.json({ id, ...v }, 201)
 })

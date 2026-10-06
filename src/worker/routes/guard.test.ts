@@ -34,7 +34,7 @@ describe('auth guard', () => {
   it('has an entry here for every registered /api route except auth and health', () => {
     const registered = app.routes
       .map((r) => `${r.method} ${r.path}`)
-      .filter((s) => !s.startsWith('ALL') && !/\/api\/(auth|health)/.test(s) && !s.includes('*'))
+      .filter((s) => !s.startsWith('ALL') && !/^\S+ \/api\/(auth\/|health$)/.test(s) && !s.includes('*'))
     for (const entry of registered) {
       const [method, path] = entry.split(' ')
       const pattern = new RegExp('^' + path!.replace(/:[^/]+/g, '[^/]+') + '$')

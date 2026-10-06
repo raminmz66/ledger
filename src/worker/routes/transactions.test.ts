@@ -118,3 +118,27 @@ describe('DELETE /api/transactions/:id', () => {
     expect(((await (await call('GET', `/api/people/${pid}`, A)).json()) as any).transactions).toHaveLength(1)
   })
 })
+
+describe('malformed bodies and field tampering', () => {
+  const raw = async (method: string, path: string, who: { cookie: string }, body: string) =>
+    app.request(path, { method, headers: { 'content-type': 'application/json', cookie: who.cookie }, body }, { DB: (await handle).db, SESSION_SECRET: 's', RESEND_API_KEY: 'r', EMAIL_FROM: 'x' })
+  it('raw "{" returns 400 invalid_body on POST transactions and PATCH transaction', async () => {
+    const pid = await person(A)
+    const id = ((await (await call('POST', `/api/people/${pid}/transactions`, A, tx)).json()) as any).id
+    for (const [m, path] of [['POST', `/api/people/${pid}/transactions`], ['PATCH', `/api/transactions/${id}`]]) {
+      const res = await raw(m!, path!, A, '{')
+      expect(res.status).toBe(400)
+      expect(await res.json()).toEqual({ error: 'invalid_body' })
+    }
+  })
+  it('PATCH ignores person_id and user_id in the body', async () => {
+    const { db } = await handle
+    const pid = await person(A)
+    const other = await person(B, 'دیگری')
+    const id = ((await (await call('POST', `/api/people/${pid}/transactions`, A, tx)).json()) as any).id
+    const res = await call('PATCH', `/api/transactions/${id}`, A, { ...tx, amount: 3, person_id: other, user_id: B.userId })
+    expect(res.status).toBe(200)
+    const row = await db.prepare('SELECT person_id, user_id, amount FROM transactions WHERE id = ?').bind(id).first<any>()
+    expect(row).toEqual({ person_id: pid, user_id: A.userId, amount: 3 })
+  })
+})

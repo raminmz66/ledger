@@ -67,3 +67,14 @@ describe('parseTransaction', () => {
     expect(parseTransaction({ ...good, amount: 0, date: 'x' })).toEqual({ ok: false, error: 'invalid_amount' })
   })
 })
+
+describe('invisible characters', () => {
+  it('rejects a name made only of ZWNJ, strips edge invisibles, keeps inner ZWNJ', () => {
+    expect(parseName('\u200c')).toEqual({ ok: false, error: 'invalid_name' })
+    expect(parseName(' \u200f علی \u200c ')).toEqual({ ok: true, value: 'علی' })
+    expect(parseName('می\u200cماند')).toEqual({ ok: true, value: 'می\u200cماند' })
+  })
+  it('turns an invisible-only note into null', () => {
+    expect(parseTransaction({ ...good, note: '\u200c' })).toMatchObject({ ok: true, value: { note: null } })
+  })
+})

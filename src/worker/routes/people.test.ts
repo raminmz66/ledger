@@ -79,13 +79,16 @@ describe('GET /api/people', () => {
     expect(byId[sara.id].balance).toBe(0)
     expect(body.totals).toEqual({ owedToMe: 8_000_000, iOwe: 3_200_000 })
   })
-  it('sorts by latest activity, newest first, and uses created_at for people without transactions', async () => {
+  it('sorts by latest transaction activity, not creation; no-transaction people use created_at', async () => {
+    const { db } = await handle
     const old = await newPerson(A, 'قدیمی')
     const active = await newPerson(A, 'فعال')
-    await addTx(active.id, A, 'paid', 1, '2026-10-01', '2099-01-01T00:00:00.000Z')
+    await addTx(old.id, A, 'paid', 1, '2026-10-01', '2099-01-01T00:00:00.000Z')
     const body = (await (await call('GET', '/api/people', A)).json()) as any
-    expect(body.people.map((p: any) => p.id)).toEqual([active.id, old.id])
+    expect(body.people.map((p: any) => p.id)).toEqual([old.id, active.id])
     expect(body.people[0].lastActivity).toBe('2099-01-01T00:00:00.000Z')
+    const row = await db.prepare('SELECT created_at FROM people WHERE id = ?').bind(active.id).first<{ created_at: string }>()
+    expect(body.people[1].lastActivity).toBe(row!.created_at)
   })
   it('sums 1e12-sized amounts without precision loss', async () => {
     const p = await newPerson(A, 'ثروتمند')
@@ -109,9 +112,10 @@ describe('GET /api/people/:id', () => {
     await addTx(p.id, A, 'paid', 100, '2026-10-01', '2026-10-01T09:00:00.000Z')
     await addTx(p.id, A, 'received', 40, '2026-10-05', '2026-10-05T09:00:00.000Z')
     await addTx(p.id, A, 'paid', 7, '2026-10-05', '2026-10-05T11:00:00.000Z')
+    await addTx(p.id, A, 'paid', 1000, '2026-09-01', '2026-10-09T00:00:00.000Z')
     const body = (await (await call('GET', `/api/people/${p.id}`, A)).json()) as any
-    expect(body).toMatchObject({ id: p.id, name: 'علی', balance: 67 })
-    expect(body.transactions.map((t: any) => t.amount)).toEqual([7, 40, 100])
+    expect(body).toMatchObject({ id: p.id, name: 'علی', balance: 1067 })
+    expect(body.transactions.map((t: any) => t.amount)).toEqual([7, 40, 100, 1000])
     expect(body.transactions[0]).toEqual({ id: expect.any(String), direction: 'paid', amount: 7, date: '2026-10-05', note: null })
   })
   it('404s for unknown ids and for another user\'s person', async () => {
@@ -163,6 +167,14 @@ describe('DELETE /api/people/:id', () => {
   })
   it('404s for unknown ids', async () => {
     expect((await call('DELETE', '/api/people/nope', A)).status).toBe(404)
+  })
+})
+
+describe('malformed JSON body', () => {
+  it('POST /api/people with raw "{" returns 400 invalid_name', async () => {
+    const res = await app.request('/api/people', { method: 'POST', headers: { 'content-type': 'application/json', cookie: A.cookie }, body: '{' }, await env())
+    expect(res.status).toBe(400)
+    expect(await res.json()).toEqual({ error: 'invalid_name' })
   })
 })
 
