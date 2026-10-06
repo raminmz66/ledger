@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import type { AppEnv } from '../env'
-import { parseName } from '../lib/ledger-validate'
+import { parseName, parseTransaction } from '../lib/ledger-validate'
 import { requireAuth } from '../middleware/require-auth'
 
 export const people = new Hono<AppEnv>()
@@ -68,4 +68,19 @@ people.delete('/:id', async (c) => {
     .bind(c.req.param('id'), c.var.userId).run()
   if (!res.meta.changes) return notFound(c)
   return c.body(null, 204)
+})
+
+people.post('/:id/transactions', async (c) => {
+  const body = await c.req.json().catch(() => null)
+  const tx = parseTransaction(body)
+  if (!tx.ok) return c.json({ error: tx.error }, 400)
+  const person = await c.env.DB.prepare('SELECT id FROM people WHERE id = ? AND user_id = ?')
+    .bind(c.req.param('id'), c.var.userId).first()
+  if (!person) return notFound(c)
+  const id = crypto.randomUUID()
+  const v = tx.value
+  await c.env.DB.prepare(
+    'INSERT INTO transactions (id, user_id, person_id, direction, amount, date, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+  ).bind(id, c.var.userId, c.req.param('id'), v.direction, v.amount, v.date, v.note, new Date().toISOString()).run()
+  return c.json({ id, ...v }, 201)
 })
