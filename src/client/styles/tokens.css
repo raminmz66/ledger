@@ -1,0 +1,22 @@
+:root {
+  --page: #f4efe6;
+  --ink: #3d3428;
+  --muted: #6a5f50;
+  --rule: #cbbfad;
+  --accent: #0f6b6b;
+  --danger: #8b3a2f;
+  --text-amount: 3.25rem; /* 52px — large amount readout */
+  --text-name: 1.375rem; /* 22px — person and balance names */
+  --text-title: 1.25rem; /* 20px — titles, and the gear glyph */
+  --text-action: 1rem; /* 16px — buttons, links, inputs; ≥16px avoids iOS focus zoom */
+  --text-status: 0.9375rem; /* 15px — status lines, body text */
+  --text-meta: 0.875rem; /* 14px — captions, footers, badges */
+  --font-display: Lalezar, Vazirmatn, Tahoma, sans-serif;
+}
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--page);
+  color: var(--ink);
+}

@@ -1,0 +1,3 @@
+SESSION_SECRET=change-me-to-a-long-random-string
+RESEND_API_KEY=re_your_key_here
+EMAIL_FROM=سیمرغ <onboarding@resend.dev>
