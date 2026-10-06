@@ -3,6 +3,8 @@
   "name": "simorgh-ledger",
   "main": "src/worker/index.ts",
   "compatibility_date": "2026-10-01",
+  "vars": { "EMAIL_FROM": "سیمرغ <onboarding@resend.dev>" },
+  "triggers": { "crons": ["17 3 * * *"] },
   "assets": {
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*"]

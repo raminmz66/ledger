@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import copy from './copy'
 
 describe('copy', () => {
-  const strings = Object.values(copy)
+  const flatten = (v: unknown): string[] =>
+    typeof v === 'string' ? [v] : Object.values(v as object).flatMap(flatten)
+  const strings = flatten(copy)
 
   it('uses Persian ی and ک, never Arabic ي or ك', () => {
     for (const s of strings) expect(s).not.toMatch(/[يك]/)

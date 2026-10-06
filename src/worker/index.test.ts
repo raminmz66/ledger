@@ -9,6 +9,13 @@ describe('worker', () => {
     expect(await res.json()).toEqual({ ok: true })
   })
 
+  it('turns thrown errors into JSON 500', async () => {
+    // No bindings supplied, so the handler throws on c.env.
+    const res = await app.request('/api/me', { headers: { Cookie: 'sid=x' } })
+    expect(res.status).toBe(500)
+    expect(await res.json()).toEqual({ error: 'internal' })
+  })
+
   it('returns JSON 404 for unknown API paths', async () => {
     const res = await app.request('/api/nope')
     expect(res.status).toBe(404)
