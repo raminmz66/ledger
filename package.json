@@ -1,10 +1,6 @@
 {
   "name": "simorgh-ledger",
-  "version": "1.0.0",
-  "description": "A small Persian (RTL) PWA for tracking money you pay to and receive from people. Sign in with email and a one-time code, record transactions with Jalali dates, see each person's balance.",
-  "directories": {
-    "doc": "docs"
-  },
+  "version": "0.1.0",
   "scripts": {
     "test": "vitest run",
     "dev": "vite",
@@ -14,11 +10,8 @@
     "icons": "node scripts/icons.mjs",
     "cf-typegen": "wrangler types"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "module",
-  "private": "true",
+  "private": true,
   "dependencies": {
     "@fontsource/lalezar": "^5.3.0",
     "@fontsource/vazirmatn": "^5.3.0",

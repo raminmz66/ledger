@@ -11,8 +11,7 @@
     {
       "binding": "DB",
       "database_name": "simorgh-db",
-      // Replaced with the real id by `wrangler d1 create simorgh-db` in Task 5.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "0a6ad455-765b-42eb-aa87-552b345220ad",
       "migrations_dir": "migrations"
     }
   ]
