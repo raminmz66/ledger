@@ -13,10 +13,8 @@ import { formatJalali } from '../dates/jalali'
 import { errorMessage } from '../errors'
 import { toFaDigits } from '../format/digits'
 import { balanceView, formatToman, signedToman } from '../format/money'
+import type { Direction, PersonDetail, Tx } from '../types'
 
-type Direction = 'paid' | 'received'
-type Tx = { id: string; direction: Direction; amount: number; date: string; note: string | null }
-type PersonDetail = { id: string; name: string; balance: number; transactions: Tx[] }
 type TxSheetState = { mode: 'add'; direction: Direction } | { mode: 'edit'; tx: Tx } | null
 
 export default function Person() {
@@ -73,7 +71,7 @@ export default function Person() {
     const res = await api('DELETE', `/api/people/${eid}`)
     if (!res.ok) {
       setDeleting(false)
-      return toast.show(errorMessage(res as { status: number; data: { error?: string } | null }), 'error')
+      return toast.show(errorMessage(res), 'error')
     }
     toast.show(copy.toast.deleted)
     navigate('/', { replace: true })

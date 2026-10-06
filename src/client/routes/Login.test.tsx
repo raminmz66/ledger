@@ -135,4 +135,43 @@ describe('Login', () => {
     await userEvent.click(await screen.findByRole('button', { name: new RegExp(copy.signIn.changeEmail) }))
     await waitFor(() => expect(screen.getByLabelText(copy.signIn.emailLabel)).toBeInTheDocument())
   })
+
+  describe('return to the original page', () => {
+    async function signInFrom(state: unknown) {
+      stubApi({
+        '/api/me': { status: 401 },
+        '/api/auth/request-code': { status: 204 },
+        '/api/auth/verify': { status: 200, body: { email: 'a@b.co' } },
+      })
+      render(
+        <MemoryRouter initialEntries={state === undefined ? ['/login'] : [{ pathname: '/login', state }]}>
+          <AuthProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/people/:id" element={<p>PERSON PAGE</p>} />
+              <Route path="/" element={<p>HOME PAGE</p>} />
+              <Route path="*" element={<p>ELSEWHERE</p>} />
+            </Routes>
+          </AuthProvider>
+        </MemoryRouter>,
+      )
+      await userEvent.type(await screen.findByLabelText(copy.signIn.emailLabel), 'a@b.co')
+      await userEvent.click(screen.getByRole('button', { name: copy.signIn.sendCode }))
+      await screen.findByText(copy.signIn.codeTitle)
+      await userEvent.click(screen.getAllByRole('textbox')[0]!)
+      await userEvent.keyboard('123456')
+    }
+    it('lands on the remembered page', async () => {
+      await signInFrom({ from: '/people/abc' })
+      expect(await screen.findByText('PERSON PAGE')).toBeInTheDocument()
+    })
+    it.each(['//evil.example', 'https://evil.example'])('ignores unsafe from %s', async (from) => {
+      await signInFrom({ from })
+      expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
+    })
+    it('lands on / without state', async () => {
+      await signInFrom(undefined)
+      expect(await screen.findByText('HOME PAGE')).toBeInTheDocument()
+    })
+  })
 })

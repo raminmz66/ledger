@@ -2,10 +2,10 @@ import copy from './copy'
 
 type Known = Exclude<keyof typeof copy.errors, 'network'>
 
-const KNOWN = new Set<string>(['invalid_name', 'invalid_amount', 'invalid_date', 'invalid_note', 'invalid_direction', 'invalid_body', 'not_found', 'internal'])
-
-export function errorMessage(res: { status: number; data: { error?: string } | null }): string {
+export function errorMessage(res: { status: number; data: unknown }): string {
   if (res.status === 0) return copy.errors.network
-  const code = res.data?.error
-  return code && KNOWN.has(code) ? copy.errors[code as Known] : copy.errors.internal
+  const code = typeof res.data === 'object' && res.data !== null ? (res.data as { error?: unknown }).error : undefined
+  return typeof code === 'string' && code !== 'network' && Object.hasOwn(copy.errors, code)
+    ? copy.errors[code as Known]
+    : copy.errors.internal
 }

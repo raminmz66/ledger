@@ -6,6 +6,7 @@ import { formatGregorianToJalali, formatJalali, todayGregorian } from '../dates/
 import { errorMessage } from '../errors'
 import { toFaDigits } from '../format/digits'
 import { numberToWordsFa } from '../format/words-fa'
+import type { Direction, Tx } from '../types'
 import { validateTransaction } from '../validation'
 import { AmountField } from './AmountField'
 import { ConfirmPress } from './ConfirmPress'
@@ -13,9 +14,6 @@ import { JalaliCalendarSheet } from './JalaliCalendarSheet'
 import { SegmentedControl } from './SegmentedControl'
 import { Sheet } from './Sheet'
 import { useToast } from './Toast'
-
-type Direction = 'paid' | 'received'
-type Tx = { id: string; direction: Direction; amount: number; date: string; note: string | null }
 
 export type TransactionSheetProps = (
   | { mode: 'add'; direction: Direction }
@@ -58,7 +56,7 @@ export function TransactionSheet(props: TransactionSheetProps) {
 
   async function finish(res: Awaited<ReturnType<typeof api>>, message: string) {
     setBusy(false)
-    if (!res.ok) return setError(errorMessage(res as { status: number; data: { error?: string } | null }))
+    if (!res.ok) return setError(errorMessage(res))
     onSaved()
     toast.show(message)
     onClose()
