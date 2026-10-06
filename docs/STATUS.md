@@ -14,7 +14,7 @@
 ## Open questions / blockers
 
 - Sending domain for other users (not blocking v1 development).
-- Phone smoke test (user, M1+M2): open https://simorgh-ledger.bartaran.workers.dev on the phone; sign in with ramin.mz66@gmail.com (the email must arrive; paste or autofill the code); check Settings and sign-out; "Add to Home Screen" and confirm icon, name «سیمرغ», RTL and Vazirmatn font. Note: only that address can receive codes until a domain is verified in Resend (other addresses get `email_failed`).
+- (done 2026-10-06, user confirmed ✅) Phone smoke test (M1+M2): open https://simorgh-ledger.bartaran.workers.dev on the phone; sign in with ramin.mz66@gmail.com (the email must arrive; paste or autofill the code); check Settings and sign-out; "Add to Home Screen" and confirm icon, name «سیمرغ», RTL and Vazirmatn font. Note: only that address can receive codes until a domain is verified in Resend (other addresses get `email_failed`).
 
 ## Deferred minors
 
