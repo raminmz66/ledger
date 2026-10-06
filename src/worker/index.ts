@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { csrf } from 'hono/csrf'
 import type { AppEnv } from './env'
+import { cleanupExpired } from './lib/cleanup'
 import { requireAuth } from './middleware/require-auth'
 import { auth } from './routes/auth'
 
@@ -19,4 +20,9 @@ app.get('/api/me', requireAuth, async (c) => {
 
 app.notFound((c) => c.json({ error: 'not_found' }, 404))
 
-export default { fetch: app.fetch }
+export default {
+  fetch: app.fetch,
+  async scheduled(_event: ScheduledController, env: AppEnv['Bindings'], ctx: ExecutionContext) {
+    ctx.waitUntil(cleanupExpired(env.DB))
+  },
+}
