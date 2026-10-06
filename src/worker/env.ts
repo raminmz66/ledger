@@ -1,5 +1,6 @@
 export type Env = {
   DB: D1Database
-  ASSETS: Fetcher
   SESSION_SECRET: string
+  RESEND_API_KEY: string
+  EMAIL_FROM: string
 }
