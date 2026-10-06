@@ -1,9 +1,18 @@
 import { Hono } from 'hono'
-import type { Env } from './env'
+import type { AppEnv } from './env'
+import { requireAuth } from './middleware/require-auth'
+import { auth } from './routes/auth'
 
-export const app = new Hono<{ Bindings: Env }>()
+export const app = new Hono<AppEnv>()
 
 app.get('/api/health', (c) => c.json({ ok: true }))
+app.route('/api/auth', auth)
+
+app.get('/api/me', requireAuth, async (c) => {
+  const row = await c.env.DB.prepare('SELECT email FROM users WHERE id = ?')
+    .bind(c.var.userId).first<{ email: string }>()
+  return row ? c.json({ email: row.email }) : c.json({ error: 'unauthorized' }, 401)
+})
 
 app.notFound((c) => c.json({ error: 'not_found' }, 404))
 

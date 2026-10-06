@@ -28,6 +28,7 @@ export async function sendLoginCode(env: MailEnv, email: string, code: string): 
     res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(8000),
       body: JSON.stringify({ from: env.EMAIL_FROM, to: [email], subject, html, text }),
     })
   } catch {
