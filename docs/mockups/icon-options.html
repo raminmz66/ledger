@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>icon-options</title><style>body{font-family:system-ui,sans-serif;background:#faf8f4;color:#222;margin:0;padding:24px 16px}.subtitle{color:#666}.opt p{font-size:14px}</style><script>function toggleSelect(e){e.classList.toggle("selected")}</script></head><body>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&family=Lalezar&display=swap");
+.icons{display:flex;flex-wrap:wrap;gap:22px;justify-content:center}
+.opt{background:#f4efe6;border:2px solid #cbbfad;border-radius:16px;padding:18px;width:280px;cursor:pointer;color:#3d3428}
+.opt.selected{border-color:#0f6b6b;box-shadow:0 0 0 3px rgba(15,107,107,.25)}
+.sizes{display:flex;align-items:flex-end;gap:16px;justify-content:center;margin-bottom:12px}
+.sizes .cap{font-size:11px;color:#6a5f50;text-align:center;margin-top:4px}
+.home{display:flex;flex-direction:column;align-items:center;gap:4px;background:#2b3a4a;border-radius:12px;padding:10px 14px;margin:0 auto 10px;width:fit-content}
+.home span{color:#fff;font-family:Vazirmatn;font-size:12px}
+.tab{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #ddd;border-radius:8px 8px 0 0;padding:4px 10px;font-family:Vazirmatn;font-size:12px;direction:rtl;width:fit-content;margin:0 auto}
+.opt h3{margin:8px 0 2px}
+.wm{font-family:Lalezar;color:#0f6b6b;font-size:30px;direction:rtl;text-align:center;margin-top:20px;display:flex;align-items:center;justify-content:center;gap:10px}
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="bird" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#0f6b6b"/>
+      <g fill="#f4efe6">
+        <path d="M50 54 C38 42 24 36 10 22 C16 40 28 54 46 60 Z"/>
+        <path d="M50 54 C62 42 76 36 90 22 C84 40 72 54 54 60 Z"/>
+        <ellipse cx="50" cy="56" rx="6.5" ry="11"/>
+        <circle cx="50" cy="40" r="5.5"/>
+        <path d="M50 68 C46 77 40 84 28 90 C41 89 47 83 50 76 C53 83 59 89 72 90 C60 84 54 77 50 68 Z"/>
+      </g>
+      <path d="M50 35 C49 28 53 23 58 20 C56 27 54 31 52 35 Z" fill="#d9a441"/>
+      <circle cx="50" cy="40" r="1.6" fill="#0f6b6b"/>
+    </symbol>
+    <symbol id="feather" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#0f6b6b"/>
+      <g transform="rotate(-28 50 50)">
+        <path d="M50 10 C74 30 76 62 50 86 C24 62 26 30 50 10 Z" fill="#f4efe6"/>
+        <path d="M50 18 L50 94" stroke="#0f6b6b" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="50" cy="38" rx="11" ry="13" fill="#d9a441"/>
+        <ellipse cx="50" cy="39" rx="5" ry="6.5" fill="#0f6b6b"/>
+      </g>
+    </symbol>
+    <symbol id="letter" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#f4efe6"/>
+      <text x="50" y="66" text-anchor="middle" font-family="Lalezar" font-size="64" fill="#0f6b6b">س</text>
+      <path d="M68 22 C64 30 64 38 68 44 C74 36 74 28 68 22 Z" fill="#d9a441"/>
+    </symbol>
+  </defs>
+</svg>
+
+<h2>Icon for «دفتر حساب سیمرغ»</h2>
+<p class="subtitle">Each option at home-screen size (192px), small (48px) and favicon (16px). Colors are the app's teal and cream, plus one gold accent. Click the one you like.</p>
+
+<div class="icons">
+
+  <div class="opt" data-choice="bird" onclick="toggleSelect(this)">
+    <div class="home"><svg width="72" height="72"><use href="#bird"/></svg><span>سیمرغ</span></div>
+    <div class="sizes">
+      <div><svg width="96" height="96"><use href="#bird"/></svg><div class="cap">192</div></div>
+      <div><svg width="48" height="48"><use href="#bird"/></svg><div class="cap">48</div></div>
+      <div><svg width="16" height="16"><use href="#bird"/></svg><div class="cap">16</div></div>
+    </div>
+    <div class="tab"><svg width="16" height="16"><use href="#bird"/></svg>دفتر حساب سیمرغ</div>
+    <h3>A. Simorgh silhouette</h3>
+    <p>A front-facing bird with raised wings, a gold crest and a split tail. Clearly a mythical bird, but the detail gets lost at 16px.</p>
+  </div>
+
+  <div class="opt" data-choice="feather" onclick="toggleSelect(this)">
+    <div class="home"><svg width="72" height="72"><use href="#feather"/></svg><span>سیمرغ</span></div>
+    <div class="sizes">
+      <div><svg width="96" height="96"><use href="#feather"/></svg><div class="cap">192</div></div>
+      <div><svg width="48" height="48"><use href="#feather"/></svg><div class="cap">48</div></div>
+      <div><svg width="16" height="16"><use href="#feather"/></svg><div class="cap">16</div></div>
+    </div>
+    <div class="tab"><svg width="16" height="16"><use href="#feather"/></svg>دفتر حساب سیمرغ</div>
+    <h3>B. Simorgh feather</h3>
+    <p>In the Shahnameh, Simorgh gives Zal a feather to burn when he needs her. Here it's a single feather with a gold eye. Very readable at any size.</p>
+  </div>
+
+  <div class="opt" data-choice="letter" onclick="toggleSelect(this)">
+    <div class="home"><svg width="72" height="72"><use href="#letter"/></svg><span>سیمرغ</span></div>
+    <div class="sizes">
+      <div><svg width="96" height="96"><use href="#letter"/></svg><div class="cap">192</div></div>
+      <div><svg width="48" height="48"><use href="#letter"/></svg><div class="cap">48</div></div>
+      <div><svg width="16" height="16"><use href="#letter"/></svg><div class="cap">16</div></div>
+    </div>
+    <div class="tab"><svg width="16" height="16"><use href="#letter"/></svg>دفتر حساب سیمرغ</div>
+    <h3>C. Letter «س» with a feather</h3>
+    <p>A monogram in Lalezar on cream, with a small gold feather. Typographic and calm, but less of a story.</p>
+  </div>
+
+</div>
+
+<div class="wm"><svg width="40" height="40"><use href="#feather"/></svg>دفتر حساب سیمرغ</div>
+<p class="subtitle" style="text-align:center">How the wordmark looks on the sign-in screen (shown with option B).</p>
+
+</body></html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>flow-and-screens</title><style>body{font-family:system-ui,sans-serif;background:#faf8f4;color:#222;margin:0;padding:24px 16px}.subtitle{color:#666}.opt p{font-size:14px}</style><script>function toggleSelect(e){e.classList.toggle("selected")}</script></head><body>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Lalezar&display=swap");
+.fa{direction:rtl;font-family:Vazirmatn,Tahoma,sans-serif;letter-spacing:0;line-height:1.7}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin:12px 0 28px;direction:rtl}
+.flow .n{background:#fff;border:1.5px solid #0f6b6b;border-radius:10px;padding:6px 12px;font-family:Vazirmatn;color:#3d3428;font-size:14px}
+.flow .a{color:#0f6b6b;font-size:18px}
+.phones{display:flex;flex-wrap:wrap;gap:22px;justify-content:center}
+.ph-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:270px}
+.ph-cap{font-size:13px;color:#555;text-align:center}
+.ph{width:260px;height:520px;background:#f4efe6;color:#3d3428;border:8px solid #222;border-radius:28px;overflow:hidden;position:relative;box-sizing:border-box;font-size:14px}
+.ph .bar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
+.ph .title{font-family:Lalezar,Vazirmatn;font-size:22px;color:#0f6b6b}
+.ph .muted{color:#6a5f50;font-size:12.5px}
+.ph .in{background:#fff;border:1px solid #cbbfad;border-radius:10px;padding:10px 12px;margin:6px 16px;color:#999;font-size:14px}
+.ph .btn{background:#0f6b6b;color:#fff;border-radius:12px;padding:11px;text-align:center;margin:10px 16px;font-weight:700}
+.ph .btn.ghost{background:transparent;color:#0f6b6b;border:1.5px solid #0f6b6b}
+.ph .sum{margin:4px 16px 8px;display:flex;gap:8px}
+.ph .sum div{flex:1;background:#fff;border:1px solid #cbbfad;border-radius:12px;padding:8px;text-align:center}
+.ph .sum b{display:block;font-size:15px}
+.ph .row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #e2d8c8}
+.ph .row .nm{font-weight:500;font-size:15px}
+.pos{color:#0f6b6b}.neg{color:#8b3a2f}.zero{color:#6a5f50}
+.ph .fab{position:absolute;bottom:16px;inset-inline-start:16px;background:#0f6b6b;color:#fff;border-radius:999px;padding:10px 16px;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+.ph .big{text-align:center;margin:10px 0 2px}
+.ph .big b{font-size:30px;display:block}
+.ph .two{display:flex;gap:8px;margin:10px 16px}
+.ph .two div{flex:1;border-radius:12px;padding:10px;text-align:center;font-weight:700}
+.ph .tx{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid #e2d8c8;font-size:13.5px}
+.ph .day{padding:6px 16px 2px;color:#6a5f50;font-size:12px}
+.ph .seg{display:flex;margin:8px 16px;border:1.5px solid #0f6b6b;border-radius:10px;overflow:hidden}
+.ph .seg div{flex:1;text-align:center;padding:8px;font-weight:700}
+.ph .seg .on{background:#0f6b6b;color:#fff}
+.ph .chips{display:flex;gap:6px;margin:4px 16px}
+.ph .chips span{border:1px solid #cbbfad;border-radius:999px;padding:3px 10px;font-size:12.5px;background:#fff}
+.ph .chips .on{border-color:#0f6b6b;color:#0f6b6b;font-weight:700}
+.ph .lbl{margin:10px 16px 0;font-size:12.5px;color:#6a5f50}
+.ph .otp{display:flex;gap:6px;justify-content:center;margin:12px 0;direction:ltr}
+.ph .otp span{width:30px;height:40px;background:#fff;border:1px solid #cbbfad;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+</style>
+
+<h2>User flow and screens: دفتر حساب</h2>
+<p class="subtitle">Calm notebook style reused from the asset tracker. Shown at phone size. The Persian text is the real copy.</p>
+
+<h3>Flow</h3>
+<div class="flow">
+  <span class="n">ورود با ایمیل</span><span class="a">←</span>
+  <span class="n">کد تأیید</span><span class="a">←</span>
+  <span class="n">خانه: فهرست اشخاص</span><span class="a">←</span>
+  <span class="n">صفحه‌ی شخص</span><span class="a">←</span>
+  <span class="n">فرم تراکنش</span>
+</div>
+<p class="subtitle" style="text-align:center">From Home: «+ شخص جدید» opens a name sheet, and ⚙ opens Settings (email, sign out). On a person's page: tap a transaction to edit or delete it; ⋯ lets you rename or delete the person.</p>
+
+<div class="phones">
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div style="padding:70px 0 10px;text-align:center"><div class="title" style="font-size:34px">دفتر حساب</div>
+    <div class="muted">حساب‌وکتاب ساده با دوستان و آشنایان</div></div>
+    <div class="lbl">ایمیل</div>
+    <div class="in" style="direction:ltr;text-align:left">name@example.com</div>
+    <div class="btn">ارسال کد ورود</div>
+    <div class="muted" style="margin:6px 16px">اگر بار اول است، حسابتان خودکار ساخته می‌شود.</div>
+  </div><div class="ph-cap">1. Sign in: email only. No separate sign-up.</div></div>
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="bar"><span>→ تغییر ایمیل</span></div>
+    <div style="padding:30px 16px 0"><b style="font-size:17px">کد ۶ رقمی را وارد کنید</b>
+    <div class="muted">کد به <bdi>name@example.com</bdi> فرستاده شد.</div></div>
+    <div class="otp"><span>۴</span><span>۸</span><span>۱</span><span></span><span></span><span></span></div>
+    <div class="btn">ورود</div>
+    <div class="muted" style="text-align:center">ارسال دوباره تا ۰:۴۲ دیگر</div>
+    <div class="muted" style="margin:18px 16px;color:#8b3a2f;display:none">کد اشتباه است. ۳ بار دیگر می‌توانید امتحان کنید.</div>
+  </div><div class="ph-cap">2. Code: auto-submits at 6 digits, paste supported, 60 s resend timer, and wrong-code / rate-limit errors appear inline.</div></div>
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="bar"><span class="title">دفتر حساب</span><span style="font-size:20px">⚙</span></div>
+    <div class="sum">
+      <div><span class="muted">طلب من</span><b class="pos">۱۲٬۵۰۰٬۰۰۰</b></div>
+      <div><span class="muted">بدهی من</span><b class="neg">۳٬۲۰۰٬۰۰۰</b></div>
+    </div>
+    <div class="row"><span class="nm">علی رضایی</span><span class="pos">۸٬۰۰۰٬۰۰۰ طلب</span></div>
+    <div class="row"><span class="nm">مریم</span><span class="neg">۳٬۲۰۰٬۰۰۰ بدهی</span></div>
+    <div class="row"><span class="nm">حسین</span><span class="pos">۴٬۵۰۰٬۰۰۰ طلب</span></div>
+    <div class="row"><span class="nm">سارا</span><span class="zero">تسویه</span></div>
+    <div class="fab">+ شخص جدید</div>
+  </div><div class="ph-cap">3. Home: two totals, then people sorted by most recent activity. Each row shows the net balance.</div></div>
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="bar"><span>→</span><span style="font-weight:700;font-size:16px">علی رضایی</span><span>⋯</span></div>
+    <div class="big"><span class="muted">از او طلب دارم</span><b class="pos">۸٬۰۰۰٬۰۰۰</b><span class="muted">تومان</span></div>
+    <div class="two">
+      <div style="background:#0f6b6b;color:#fff">پرداخت کردم</div>
+      <div style="border:1.5px solid #0f6b6b;color:#0f6b6b">دریافت کردم</div>
+    </div>
+    <div class="day">۱۴ مهر ۱۴۰۵</div>
+    <div class="tx"><span>پرداخت · قرض برای ماشین</span><span class="pos">+۱۰٬۰۰۰٬۰۰۰</span></div>
+    <div class="day">۲ مهر ۱۴۰۵</div>
+    <div class="tx"><span>دریافت</span><span class="neg">−۲٬۰۰۰٬۰۰۰</span></div>
+    <div class="day">۲۸ شهریور ۱۴۰۵</div>
+    <div class="tx"><span>پرداخت · سهم شام</span><span class="pos">+۵۰۰٬۰۰۰</span></div>
+    <div class="tx"><span>دریافت</span><span class="neg">−۵۰۰٬۰۰۰</span></div>
+  </div><div class="ph-cap">4. Person: balance in words and digits, two big action buttons, then history grouped by Jalali date (newest first). Tap a row to edit it.</div></div>
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="bar"><span>✕</span><span style="font-weight:700;font-size:16px">تراکنش با علی رضایی</span><span></span></div>
+    <div class="seg"><div class="on">پرداخت کردم</div><div>دریافت کردم</div></div>
+    <div class="lbl">مبلغ (تومان)</div>
+    <div class="in" style="color:#3d3428;font-size:18px;font-weight:700">۲٬۵۰۰٬۰۰۰</div>
+    <div class="muted" style="margin:0 16px">دو میلیون و پانصد هزار تومان</div>
+    <div class="lbl">تاریخ</div>
+    <div class="chips"><span class="on">امروز</span><span>دیروز</span><span>📅 انتخاب تاریخ</span></div>
+    <div class="lbl">توضیح (اختیاری)</div>
+    <div class="in">مثلاً قرض برای ماشین</div>
+    <div class="btn">ذخیره</div>
+  </div><div class="ph-cap">5. Transaction form (bottom sheet): direction preset by the button you tapped, numeric keypad, amount also written out in words, date defaults to today. Edit mode adds «حذف تراکنش».</div></div>
+
+</div>
+
+</body></html>

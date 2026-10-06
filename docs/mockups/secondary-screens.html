@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>secondary-screens</title><style>body{font-family:system-ui,sans-serif;background:#faf8f4;color:#222;margin:0;padding:24px 16px}.subtitle{color:#666}.opt p{font-size:14px}</style><script>function toggleSelect(e){e.classList.toggle("selected")}</script></head><body>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Lalezar&display=swap");
+.fa{direction:rtl;font-family:Vazirmatn,Tahoma,sans-serif;letter-spacing:0;line-height:1.7}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin:12px 0 28px;direction:rtl}
+.flow .n{background:#fff;border:1.5px solid #0f6b6b;border-radius:10px;padding:6px 12px;font-family:Vazirmatn;color:#3d3428;font-size:14px}
+.flow .a{color:#0f6b6b;font-size:18px}
+.phones{display:flex;flex-wrap:wrap;gap:22px;justify-content:center}
+.ph-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:270px}
+.ph-cap{font-size:13px;color:#555;text-align:center}
+.ph{width:260px;height:520px;background:#f4efe6;color:#3d3428;border:8px solid #222;border-radius:28px;overflow:hidden;position:relative;box-sizing:border-box;font-size:14px}
+.ph .bar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
+.ph .title{font-family:Lalezar,Vazirmatn;font-size:22px;color:#0f6b6b}
+.ph .muted{color:#6a5f50;font-size:12.5px}
+.ph .in{background:#fff;border:1px solid #cbbfad;border-radius:10px;padding:10px 12px;margin:6px 16px;color:#999;font-size:14px}
+.ph .btn{background:#0f6b6b;color:#fff;border-radius:12px;padding:11px;text-align:center;margin:10px 16px;font-weight:700}
+.ph .btn.ghost{background:transparent;color:#0f6b6b;border:1.5px solid #0f6b6b}
+.ph .sum{margin:4px 16px 8px;display:flex;gap:8px}
+.ph .sum div{flex:1;background:#fff;border:1px solid #cbbfad;border-radius:12px;padding:8px;text-align:center}
+.ph .sum b{display:block;font-size:15px}
+.ph .row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #e2d8c8}
+.ph .row .nm{font-weight:500;font-size:15px}
+.pos{color:#0f6b6b}.neg{color:#8b3a2f}.zero{color:#6a5f50}
+.ph .fab{position:absolute;bottom:16px;inset-inline-start:16px;background:#0f6b6b;color:#fff;border-radius:999px;padding:10px 16px;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+.ph .big{text-align:center;margin:10px 0 2px}
+.ph .big b{font-size:30px;display:block}
+.ph .two{display:flex;gap:8px;margin:10px 16px}
+.ph .two div{flex:1;border-radius:12px;padding:10px;text-align:center;font-weight:700}
+.ph .tx{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid #e2d8c8;font-size:13.5px}
+.ph .day{padding:6px 16px 2px;color:#6a5f50;font-size:12px}
+.ph .seg{display:flex;margin:8px 16px;border:1.5px solid #0f6b6b;border-radius:10px;overflow:hidden}
+.ph .seg div{flex:1;text-align:center;padding:8px;font-weight:700}
+.ph .seg .on{background:#0f6b6b;color:#fff}
+.ph .chips{display:flex;gap:6px;margin:4px 16px}
+.ph .chips span{border:1px solid #cbbfad;border-radius:999px;padding:3px 10px;font-size:12.5px;background:#fff}
+.ph .chips .on{border-color:#0f6b6b;color:#0f6b6b;font-weight:700}
+.ph .lbl{margin:10px 16px 0;font-size:12.5px;color:#6a5f50}
+.ph .otp{display:flex;gap:6px;justify-content:center;margin:12px 0;direction:ltr}
+.ph .otp span{width:30px;height:40px;background:#fff;border:1px solid #cbbfad;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
+</style>
+<style>
+.ph .shade{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.ph .sheet{position:absolute;inset-inline:0;bottom:0;background:#f4efe6;border-radius:18px 18px 0 0;padding-bottom:10px}
+.ph .grab{width:40px;height:4px;background:#cbbfad;border-radius:4px;margin:8px auto}
+.cal{margin:4px 14px;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:13px}
+.cal .h{color:#6a5f50;font-size:12px}
+.cal span{padding:5px 0;border-radius:8px}
+.cal .sel{background:#0f6b6b;color:#fff;font-weight:700}
+.cal .tod{border:1.5px solid #0f6b6b}
+.cal .off{color:#c9bfae}
+.ph .menu{position:absolute;top:44px;inset-inline-end:12px;background:#fff;border:1px solid #cbbfad;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.15);min-width:140px}
+.ph .menu div{padding:10px 14px;border-bottom:1px solid #eee}
+.ph .danger{color:#8b3a2f}
+.ph .btn.dz{background:transparent;color:#8b3a2f;border:1.5px solid #8b3a2f}
+.ph .btn.dz.armed{background:#8b3a2f;color:#fff}
+</style>
+
+<h2>Secondary screens</h2>
+<p class="subtitle">Date picker, adding a person, editing and deleting, and Settings. Deleting uses the asset tracker's «tap twice» pattern: the first tap turns the button red for 3 seconds, a second tap confirms. There are no browser pop-ups.</p>
+
+<div class="phones">
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="shade"></div>
+    <div class="sheet">
+      <div class="grab"></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 18px;font-weight:700"><span>›</span><span>مهر ۱۴۰۵</span><span>‹</span></div>
+      <div class="cal">
+        <span class="h">ش</span><span class="h">ی</span><span class="h">د</span><span class="h">س</span><span class="h">چ</span><span class="h">پ</span><span class="h">ج</span>
+        <span class="off">۲۹</span><span class="off">۳۰</span><span class="off">۳۱</span><span>۱</span><span>۲</span><span>۳</span><span>۴</span>
+        <span>۵</span><span>۶</span><span>۷</span><span>۸</span><span>۹</span><span class="sel">۱۰</span><span>۱۱</span>
+        <span>۱۲</span><span>۱۳</span><span class="tod">۱۴</span><span>۱۵</span><span>۱۶</span><span>۱۷</span><span>۱۸</span>
+        <span>۱۹</span><span>۲۰</span><span>۲۱</span><span>۲۲</span><span>۲۳</span><span>۲۴</span><span>۲۵</span>
+        <span>۲۶</span><span>۲۷</span><span>۲۸</span><span>۲۹</span><span>۳۰</span><span class="off">۱</span><span class="off">۲</span>
+      </div>
+      <div class="btn ghost" style="margin-top:12px">امروز</div>
+    </div>
+  </div><div class="ph-cap">6. Jalali calendar (from «انتخاب تاریخ»): week starts on Saturday, today is outlined, one tap picks a day and closes. Future dates are allowed.</div></div>
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="bar"><span class="title">دفتر حساب</span><span style="font-size:20px">⚙</span></div>
+    <div class="row"><span class="nm">علی رضایی</span><span class="pos">۸٬۰۰۰٬۰۰۰ طلب</span></div>
+    <div class="row"><span class="nm">مریم</span><span class="neg">۳٬۲۰۰٬۰۰۰ بدهی</span></div>
+    <div class="shade"></div>
+    <div class="sheet">
+      <div class="grab"></div>
+      <div style="padding:2px 16px;font-weight:700;font-size:16px">شخص جدید</div>
+      <div class="lbl">نام</div>
+      <div class="in" style="color:#3d3428">رضا محمدی</div>
+      <div class="btn">افزودن</div>
+    </div>
+  </div><div class="ph-cap">7. Add a person: name only, then it opens that person's page right away. Duplicate names are allowed.</div></div>
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="bar"><span>→</span><span style="font-weight:700;font-size:16px">علی رضایی</span><span>⋯</span></div>
+    <div class="menu"><div>تغییر نام</div><div class="danger">حذف شخص</div></div>
+    <div class="big" style="margin-top:60px"><span class="muted">از او طلب دارم</span><b class="pos">۸٬۰۰۰٬۰۰۰</b></div>
+    <div class="shade" style="top:auto;height:0"></div>
+    <div style="position:absolute;bottom:0;inset-inline:0;padding:10px 0;background:#fff;border-top:1px solid #cbbfad">
+      <div style="padding:0 16px;font-size:13px">«علی رضایی» و ۴ تراکنشش حذف می‌شود.</div>
+      <div class="btn dz armed">برای حذف دوباره بزنید</div>
+    </div>
+  </div><div class="ph-cap">8. Person menu (⋯): rename, or delete. Deleting removes the person and all their transactions after a second tap.</div></div>
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="bar"><span>✕</span><span style="font-weight:700;font-size:16px">ویرایش تراکنش</span><span></span></div>
+    <div class="seg"><div class="on">پرداخت کردم</div><div>دریافت کردم</div></div>
+    <div class="lbl">مبلغ (تومان)</div>
+    <div class="in" style="color:#3d3428;font-size:18px;font-weight:700">۱۰٬۰۰۰٬۰۰۰</div>
+    <div class="lbl">تاریخ</div>
+    <div class="in" style="color:#3d3428">۱۴ مهر ۱۴۰۵</div>
+    <div class="lbl">توضیح</div>
+    <div class="in" style="color:#3d3428">قرض برای ماشین</div>
+    <div class="btn">ذخیره‌ی تغییرات</div>
+    <div class="btn dz">حذف تراکنش</div>
+  </div><div class="ph-cap">9. Edit a transaction: the same form, filled in, with a delete button underneath (tap twice).</div></div>
+
+  <div class="ph-wrap"><div class="ph fa">
+    <div class="bar"><span>→</span><span style="font-weight:700;font-size:16px">تنظیمات</span><span></span></div>
+    <div class="lbl">حساب کاربری</div>
+    <div class="in" style="direction:ltr;text-align:left;color:#3d3428">name@example.com</div>
+    <div class="btn ghost" style="margin-top:20px">خروج از حساب</div>
+    <div class="muted" style="position:absolute;bottom:14px;width:100%;text-align:center">دفتر حساب · نسخه‌ی ۱</div>
+  </div><div class="ph-cap">10. Settings: your email and sign out. Nothing else in v1.</div></div>
+
+</div>
+
+</body></html>
