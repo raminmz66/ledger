@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Navigate, useNavigate } from 'react-router'
+import { Navigate, useLocation, useNavigate } from 'react-router'
 import { api } from '../api'
 import { useAuth } from '../auth/AuthContext'
+import { safeReturnPath } from '../auth/return-to'
 import OtpInput from '../components/OtpInput'
 import copy from '../copy'
 import { toFaDigits } from '../format/digits'
@@ -12,6 +13,8 @@ type Err = { email?: string; error?: string; retryAfter?: number; attemptsLeft?:
 export default function Login() {
   const { status, setAuthed } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const target = safeReturnPath((location.state as { from?: unknown } | null)?.from)
   const [step, setStep] = useState<'email' | 'code'>('email')
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
@@ -27,7 +30,7 @@ export default function Login() {
     return () => clearInterval(id)
   }, [seconds > 0])
 
-  if (status === 'authed') return <Navigate to="/" replace />
+  if (status === 'authed') return <Navigate to={target} replace />
 
   async function sendCode(e?: FormEvent) {
     e?.preventDefault()
@@ -57,7 +60,7 @@ export default function Login() {
     setBusy(false)
     if (r.ok) {
       setAuthed(r.data?.email ?? email.trim())
-      navigate('/', { replace: true })
+      navigate(target, { replace: true })
       return
     }
     setResetKey((k) => k + 1)

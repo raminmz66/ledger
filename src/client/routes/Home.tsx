@@ -5,11 +5,7 @@ import { PersonSheet } from '../components/PersonSheet'
 import copy from '../copy'
 import { useApiData } from '../data/useApiData'
 import { formatToman } from '../format/money'
-
-type PeopleList = {
-  totals: { owedToMe: number; iOwe: number }
-  people: { id: string; name: string; balance: number; lastActivity: string }[]
-}
+import type { PeopleList } from '../types'
 
 export default function Home() {
   const { status, data, error, reload } = useApiData<PeopleList>('/api/people')

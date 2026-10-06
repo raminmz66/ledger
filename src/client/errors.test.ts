@@ -15,5 +15,8 @@ describe('errorMessage', () => {
   it('falls back to the generic message for unknown codes and empty bodies', () => {
     expect(errorMessage({ status: 500, data: { error: 'weird' } })).toBe(copy.errors.internal)
     expect(errorMessage({ status: 500, data: null })).toBe(copy.errors.internal)
+    expect(errorMessage({ status: 500, data: 'plain text' })).toBe(copy.errors.internal)
+    expect(errorMessage({ status: 500, data: undefined })).toBe(copy.errors.internal)
+    expect(errorMessage({ status: 400, data: { error: 5 } })).toBe(copy.errors.internal)
   })
 })

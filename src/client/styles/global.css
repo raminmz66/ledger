@@ -183,8 +183,10 @@ html {
   box-sizing: border-box;
   inline-size: 100%;
   max-inline-size: 480px;
+  max-block-size: 92vh;
   max-block-size: 92dvh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0.5rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
   background: var(--page);
   border-start-start-radius: 18px;
@@ -223,6 +225,11 @@ html {
   border-radius: 999px;
   font-size: var(--text-status);
   text-align: center;
+}
+
+.toast--error {
+  background: var(--danger);
+  color: #fff;
 }
 
 .fab {
@@ -470,3 +477,33 @@ html {
 .person-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-block-end: 1rem; }
 .day-header { margin: 1rem 0.25rem 0.5rem; color: var(--muted); font-size: var(--text-meta); font-weight: 400; }
 .tx-row { inline-size: 100%; background: none; border: 0; border-block-end: 1px solid #e2d8c8; font: inherit; cursor: pointer; }
+
+.update-banner {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  min-block-size: 44px;
+  padding-block: 0.25rem;
+  padding-block-start: calc(0.25rem + env(safe-area-inset-top));
+  padding-inline: 0.75rem;
+  background: var(--accent);
+  color: #fff;
+}
+
+.update-banner__btn {
+  min-block-size: 44px;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.settings-install {
+  margin-block-end: 1.5rem;
+}
+.settings-install__title {
+  margin-block: 0 0.5rem;
+  font-size: 1rem;
+}

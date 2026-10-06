@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     cloudflare(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       strategies: 'generateSW',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {

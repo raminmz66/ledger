@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import copy from '../copy'
@@ -25,7 +25,7 @@ describe('PersonSheet add', () => {
     const calls = stubApi({})
     wrap(<PersonSheet open mode="add" onClose={() => {}} onDone={() => {}} />)
     await userEvent.click(screen.getByRole('button', { name: copy.personSheet.add }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.invalid_name)
+    expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(copy.errors.invalid_name)
     expect(calls).toHaveLength(0)
   })
 
@@ -35,7 +35,7 @@ describe('PersonSheet add', () => {
     await userEvent.type(screen.getByLabelText(copy.personSheet.nameLabel), 'علی')
     const btn = screen.getByRole('button', { name: copy.personSheet.add })
     await userEvent.click(btn)
-    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.internal)
+    expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(copy.errors.internal)
     expect(screen.getByLabelText(copy.personSheet.nameLabel)).toHaveValue('علی')
     expect(btn).toBeEnabled()
   })

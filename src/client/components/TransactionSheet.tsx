@@ -1,11 +1,12 @@
 import dayjs from 'dayjs'
-import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
+import { Fragment, useEffect, useRef, useState, type FormEvent, type RefObject } from 'react'
 import { api } from '../api'
 import copy from '../copy'
 import { formatGregorianToJalali, formatJalali, todayGregorian } from '../dates/jalali'
 import { errorMessage } from '../errors'
 import { toFaDigits } from '../format/digits'
 import { numberToWordsFa } from '../format/words-fa'
+import type { Direction, Tx } from '../types'
 import { validateTransaction } from '../validation'
 import { AmountField } from './AmountField'
 import { ConfirmPress } from './ConfirmPress'
@@ -14,13 +15,10 @@ import { SegmentedControl } from './SegmentedControl'
 import { Sheet } from './Sheet'
 import { useToast } from './Toast'
 
-type Direction = 'paid' | 'received'
-type Tx = { id: string; direction: Direction; amount: number; date: string; note: string | null }
-
 export type TransactionSheetProps = (
   | { mode: 'add'; direction: Direction }
   | { mode: 'edit'; tx: Tx }
-) & { open: boolean; personId: string; personName: string; onClose: () => void; onSaved: () => void }
+) & { open: boolean; personId: string; personName: string; onClose: () => void; onSaved: () => void; returnFocusRef?: RefObject<HTMLElement | null> }
 
 const yesterday = () => dayjs(todayGregorian()).subtract(1, 'day').format('YYYY-MM-DD')
 
@@ -58,7 +56,7 @@ export function TransactionSheet(props: TransactionSheetProps) {
 
   async function finish(res: Awaited<ReturnType<typeof api>>, message: string) {
     setBusy(false)
-    if (!res.ok) return setError(errorMessage(res as { status: number; data: { error?: string } | null }))
+    if (!res.ok) return setError(errorMessage(res))
     onSaved()
     toast.show(message)
     onClose()
@@ -92,7 +90,7 @@ export function TransactionSheet(props: TransactionSheetProps) {
 
   return (
     <Fragment>
-      <Sheet open={open} title={tx ? copy.txSheet.editTitle : `${copy.txSheet.addTitle} ${personName}`} onClose={onClose} busy={busy}>
+      <Sheet open={open} title={tx ? copy.txSheet.editTitle : `${copy.txSheet.addTitle} ${personName}`} onClose={onClose} busy={busy} returnFocusRef={props.returnFocusRef}>
         <form ref={form} className="sheet-form" onSubmit={submit} noValidate>
           <SegmentedControl
             options={[{ value: 'paid', label: copy.person.paidButton }, { value: 'received', label: copy.person.receivedButton }]}

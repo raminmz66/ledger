@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
@@ -59,5 +59,99 @@ describe('Sheet', () => {
     expect(screen.getByLabelText('فیلد')).toHaveFocus()
     await userEvent.keyboard('{Escape}')
     expect(opener).toHaveFocus()
+  })
+})
+
+function rootContainer() {
+  const root = document.createElement('div')
+  root.id = 'root'
+  document.body.appendChild(root)
+  return root
+}
+
+describe('Sheet a11y', () => {
+  it('renders outside #root and marks #root inert only while open', async () => {
+    const root = rootContainer()
+    function App() {
+      const [open, setOpen] = useState(false)
+      return (
+        <>
+          <button onClick={() => setOpen(true)}>باز کن</button>
+          <Sheet open={open} title="عنوان" onClose={() => setOpen(false)}><input aria-label="فیلد" /></Sheet>
+        </>
+      )
+    }
+    render(<App />, { container: root })
+    expect(root).not.toHaveAttribute('inert')
+    await userEvent.click(screen.getByRole('button', { name: 'باز کن' }))
+    expect(root).toHaveAttribute('inert')
+    expect(root.contains(screen.getByRole('dialog'))).toBe(false)
+    await userEvent.keyboard('{Escape}')
+    expect(root).not.toHaveAttribute('inert')
+    root.remove()
+  })
+
+  it('keeps #root inert while a second sheet is stacked and until the last one closes', async () => {
+    const root = rootContainer()
+    function App() {
+      const [a, setA] = useState(true)
+      const [b, setB] = useState(true)
+      return (
+        <>
+          <Sheet open={a} title="الف" onClose={() => setA(false)}><button>x</button></Sheet>
+          <Sheet open={b} title="ب" onClose={() => setB(false)}><button>y</button></Sheet>
+        </>
+      )
+    }
+    render(<App />, { container: root })
+    expect(root).toHaveAttribute('inert')
+    await userEvent.keyboard('{Escape}') // closes the topmost (ب)
+    expect(root).toHaveAttribute('inert')
+    await userEvent.keyboard('{Escape}')
+    expect(root).not.toHaveAttribute('inert')
+    root.remove()
+  })
+
+  it('traps Tab and Shift+Tab inside the dialog', async () => {
+    render(
+      <Sheet open title="عنوان" onClose={() => {}}>
+        <input aria-label="اول" />
+        <button>دوم</button>
+      </Sheet>,
+    )
+    const first = screen.getByLabelText('اول')
+    const close = screen.getByRole('button', { name: 'بستن' })
+    expect(first).toHaveFocus()
+    await userEvent.tab()
+    expect(screen.getByRole('button', { name: 'دوم' })).toHaveFocus()
+    await userEvent.tab()
+    expect(close).toHaveFocus()
+    await userEvent.tab()
+    expect(first).toHaveFocus() // wrapped, did not leave the dialog
+    await userEvent.tab({ shift: true })
+    expect(close).toHaveFocus() // wrapped backwards
+  })
+
+  it('returns focus to returnFocusRef when the opener has unmounted', async () => {
+    function App() {
+      const [open, setOpen] = useState(false)
+      const [showOpener, setShowOpener] = useState(true)
+      const anchor = useRef<HTMLButtonElement>(null)
+      return (
+        <>
+          <button ref={anchor}>لنگر</button>
+          {showOpener && (
+            <button onClick={() => { setOpen(true); setShowOpener(false) }}>باز کن</button>
+          )}
+          <Sheet open={open} title="عنوان" onClose={() => setOpen(false)} returnFocusRef={anchor}>
+            <input aria-label="فیلد" />
+          </Sheet>
+        </>
+      )
+    }
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: 'باز کن' }))
+    await userEvent.keyboard('{Escape}')
+    expect(screen.getByRole('button', { name: 'لنگر' })).toHaveFocus()
   })
 })

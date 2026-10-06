@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthContext'
 import ProtectedRoute from './auth/ProtectedRoute'
 import { ToastProvider } from './components/Toast'
+import { UpdateBanner } from './pwa/UpdateBanner'
 import Home from './routes/Home'
 import Person from './routes/Person'
 import Login from './routes/Login'
@@ -13,6 +14,7 @@ export default function App() {
       <AuthProvider>
         <div className="app-shell">
           <ToastProvider>
+          <UpdateBanner />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route element={<ProtectedRoute />}>

@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent, type RefObject } from 'react'
 import { api } from '../api'
 import copy from '../copy'
 import { errorMessage } from '../errors'
@@ -9,7 +9,7 @@ import { useToast } from './Toast'
 export type PersonSheetProps = (
   | { mode: 'add' }
   | { mode: 'rename'; personId: string; initialName: string }
-) & { open: boolean; onClose: () => void; onDone: (person: { id: string; name: string }) => void }
+) & { open: boolean; onClose: () => void; onDone: (person: { id: string; name: string }) => void; returnFocusRef?: RefObject<HTMLElement | null> }
 
 export function PersonSheet(props: PersonSheetProps) {
   const { open, onClose, onDone } = props
@@ -34,13 +34,13 @@ export function PersonSheet(props: PersonSheetProps) {
       ? await api<{ id: string; name: string }>('POST', '/api/people', { name: v.value })
       : await api<{ id: string; name: string }>('PATCH', `/api/people/${props.personId}`, { name: v.value })
     setBusy(false)
-    if (!res.ok || !res.data) return setError(errorMessage(res as { status: number; data: { error?: string } | null }))
+    if (!res.ok || !res.data) return setError(errorMessage(res))
     toast.show(copy.toast.saved)
     onDone({ id: res.data.id, name: res.data.name })
   }
 
   return (
-    <Sheet open={open} title={props.mode === 'add' ? copy.personSheet.addTitle : copy.personSheet.renameTitle} onClose={onClose} busy={busy}>
+    <Sheet open={open} title={props.mode === 'add' ? copy.personSheet.addTitle : copy.personSheet.renameTitle} onClose={onClose} busy={busy} returnFocusRef={props.returnFocusRef}>
       <form className="sheet-form" onSubmit={submit} noValidate>
         <label className="field">
           {copy.personSheet.nameLabel}

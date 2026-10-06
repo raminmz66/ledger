@@ -1,37 +1,31 @@
 # Status
 
-**Current milestone:** M5 Polish (not started)
-**Last done:** M4 Screens merged and deployed (293 tests): home, person page, sheets, Jalali calendar, edit/delete flows (2026-10-06)
-**Next step:** write the M5 plan (superpowers:writing-plans). Scope from the M4 review: Sheet a11y (focus trap or `inert` on `.app-shell`, `overscroll-behavior: contain`, optional returnFocus ref, tests for focus return across stacked sheets); keep form drafts across `auth:expired` (sessionStorage) and return to the original route after login; Toast persistent live region + error variant; shared `types.ts` for API shapes (`Tx`, `PersonDetail`, `PeopleList`), widen `errorMessage` signature, drop casts; real-device pass notes (iOS keyboard over sheets/dvh, safe areas, `:has()` fallback); SW update prompt instead of silent autoUpdate; optional copy pass (تسویه wording); README deploy guide; final copy lint; v1 tag.
+**Current milestone:** v1 shipped (M0–M5 done)
+**Last done:** M5 Polish merged, deployed and tagged `v1.0.0` (2026-10-06). Live: https://simorgh-ledger.bartaran.workers.dev
+**Next step:** nothing is queued. Pick from "Wishes" below when the owner decides.
 
-## Resources
+## What exists
 
-- Worker `simorgh-ledger`, D1 `simorgh-db` (id in wrangler.jsonc), secrets `SESSION_SECRET` and `RESEND_API_KEY` already set on the Worker.
-- Local secrets in gitignored `.dev.vars` (SESSION_SECRET, RESEND_API_KEY, EMAIL_FROM).
-- Email: sender `onboarding@resend.dev`, which only delivers to ramin.mz66@gmail.com until a domain is verified in Resend.
-- Rotate the Resend key when v1 is done: create a new key in Resend, then `npx wrangler secret put RESEND_API_KEY` and update `.dev.vars`.
+- Worker `simorgh-ledger` (Hono API + static React build), D1 `simorgh-db`, daily cron cleanup, Resend email.
+- 346 tests (Worker with Miniflare D1, client with Testing Library). Spec: `docs/superpowers/specs/`, plans: `docs/superpowers/plans/`, mockups: `docs/mockups/`.
+- Secrets on the Worker: `SESSION_SECRET`, `RESEND_API_KEY`. `EMAIL_FROM` is a var in `wrangler.jsonc`. Local secrets live in gitignored `.dev.vars`.
 
-## Open questions / blockers
+## Owner to-do (needs the owner, not code)
 
-- Phone smoke test (user, M3+M4): open the live URL, add a person, add «پرداخت کردم» with a calendar date, add «دریافت کردم», edit a transaction, delete one (second tap), rename, delete the person, check totals on Home; check the calendar's month arrows (next on the left), the toast at the top, the keyboard over the transaction sheet, and install the PWA.
+- **Real-device pass** on the phone: add people and both kinds of transactions with the calendar, edit, delete (second tap), rename, delete a person, check totals on Home; calendar month arrows (next on the left); keyboard over the transaction sheet; toast; install to the home screen. Note: a phone still running the pre-v1 build gets this version only after the app is fully closed once.
+- **Sending domain:** until a domain is verified in Resend, only ramin.mz66@gmail.com can receive login codes (other addresses get `email_failed`). Steps are in the README ("Email setup").
+- **Rotate the Resend key** (it was pasted into the chat): create a new key in Resend, `npx wrangler secret put RESEND_API_KEY`, update `.dev.vars`, delete the old key.
+- **License:** none chosen yet (README says all rights reserved).
 
-- Sending domain for other users (not blocking v1 development).
-- (done 2026-10-06, user confirmed ✅) Phone smoke test (M1+M2): open https://simorgh-ledger.bartaran.workers.dev on the phone; sign in with ramin.mz66@gmail.com (the email must arrive; paste or autofill the code); check Settings and sign-out; "Add to Home Screen" and confirm icon, name «سیمرغ», RTL and Vazirmatn font. Note: only that address can receive codes until a domain is verified in Resend (other addresses get `email_failed`).
+## Wishes (not scheduled)
 
-## Deferred minors
-
-- package.json cleanup (private as boolean, npm init leftovers); `Env.ASSETS` declared without a binding.
-- PAT's jalali test expects 10 Mordad for 2025-07-31; the correct date is 9 Mordad (our copy is fixed; tell the PAT owner).
-- SW `autoUpdate` may reload mid-form: switch to a prompt-style update in M3/M5.
-- icons.mjs regex is fragile if the SVG gains nested groups.
-
-- M2 deferred: db.ts splits migrations on ';'; parallel-guess test could add a variant with the right code mid-burst; validate.ts invisible chars are literal.
-
-- M3 deferred: id tie-break sort tests; year range check (0100–9999 accepted); stale 401 after fresh login could sign out (tiny window).
+- Search people, archive settled people, export/backup, more currencies.
+- Keep form drafts across `auth:expired` (sessionStorage).
+- Real-device keyboard handling for sheets (`dvh`), `:has()` fallback for old WebViews.
+- Cosmetic: toast overlaps the person name briefly at the top; amount field alignment; double shade when the calendar stacks over the transaction sheet.
+- Deferred minors: test DB helper splits migrations on `;`; parallel-guess test could add a mid-burst variant; years 0100–9999 accepted by date validation; `/api/*` has no CSP header (JSON only).
+- PAT (personal-asset-tracker) has a wrong date fixture in `jalali.test.ts` (expects 10 Mordad for 2025-07-31; correct is 9 Mordad).
 
 ## Log
 
-- 2026-10-06: M0 design done. M1 built via subagent-driven plan (5 tasks, all reviewed), deployed to workers.dev.
-- 2026-10-06: M2 built (7 tasks, opus security review found and fixed a concurrent-guess bypass and login CSRF), deployed. EMAIL_FROM lives in wrangler.jsonc vars; secrets SESSION_SECRET/RESEND_API_KEY on the Worker. Live check: owner email request-code 204.
-- 2026-10-06: M3 done: 4 tasks batched, one opus whole-branch review found only weak sort tests + hardening (fixed). Live: /api/people 401 anon, health 200.
-- 2026-10-06: M4 done: 5 tasks, headless-browser QA (24 screenshots) fixed RTL calendar arrows/amount focus/LTR signs/toast, opus whole-branch review fixed delete double-submit, stale-response hook, bdi isolation, silent refetch errors. Deployed.
+- 2026-10-06: M0 design; M1 skeleton; M2 auth (opus security review fixed a concurrent-guess bypass and login CSRF); M3 data API; M4 screens (headless-browser QA fixed RTL arrows/focus/signs/toast); M5 polish (inert sheets, assertive toasts, update prompt, install hints, headers, README). All deployed; v1.0.0 tagged.
